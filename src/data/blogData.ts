@@ -170,3 +170,9 @@ export const getBlogsByCategory = (categorySlug: string): BlogPost[] => {
 export const getFeaturedPost = (): BlogPost | undefined => {
   return blogPosts.find((post) => post.featured);
 };
+
+export const getFeaturedPosts = (count: number = 3): BlogPost[] => {
+  const featured = blogPosts.filter((post) => post.featured);
+  const remaining = blogPosts.filter((post) => !post.featured).slice(0, count - featured.length);
+  return [...featured, ...remaining].slice(0, count);
+};

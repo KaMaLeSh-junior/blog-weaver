@@ -3,7 +3,14 @@ import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
 import AdSpace from "@/components/blog/AdSpace";
-import { blogPosts, getFeaturedPost, categories } from "@/data/blogData";
+import { blogPosts, getFeaturedPosts, categories } from "@/data/blogData";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -11,10 +18,11 @@ gsap.registerPlugin(ScrollTrigger);
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState("all");
+  const [useCarousel, setUseCarousel] = useState(true);
   const heroRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
-  const featuredPost = getFeaturedPost();
+  const featuredPosts = getFeaturedPosts(4);
   const filteredPosts = activeCategory === "all"
     ? blogPosts.filter((post) => !post.featured)
     : blogPosts.filter(
@@ -63,7 +71,29 @@ const Index = () => {
       {/* Hero Section */}
       <section className="gradient-hero py-12 md:py-16" ref={heroRef}>
         <div className="container">
-          {featuredPost && <BlogCard post={featuredPost} variant="featured" />}
+          {useCarousel && featuredPosts.length > 1 ? (
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full"
+            >
+              <CarouselContent>
+                {featuredPosts.map((post) => (
+                  <CarouselItem key={post.id}>
+                    <BlogCard post={post} variant="featured" />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <div className="flex justify-center gap-2 mt-6">
+                <CarouselPrevious className="static translate-y-0 bg-card hover:bg-accent" />
+                <CarouselNext className="static translate-y-0 bg-card hover:bg-accent" />
+              </div>
+            </Carousel>
+          ) : (
+            featuredPosts[0] && <BlogCard post={featuredPosts[0]} variant="featured" />
+          )}
         </div>
       </section>
 
