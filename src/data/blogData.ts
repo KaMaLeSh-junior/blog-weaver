@@ -24,6 +24,8 @@ export interface BlogPost {
   publishedAt: string;
   readTime: number;
   featured?: boolean;
+  views?: number;
+  trending?: boolean;
 }
 
 export interface Category {
@@ -94,6 +96,8 @@ export const blogPosts: BlogPost[] = [
     publishedAt: "2025-01-10",
     readTime: 5,
     featured: true,
+    views: 15420,
+    trending: true,
   },
   {
     id: "2",
@@ -106,6 +110,8 @@ export const blogPosts: BlogPost[] = [
     author: authors[0],
     publishedAt: "2025-01-08",
     readTime: 7,
+    views: 8930,
+    trending: true,
   },
   {
     id: "3",
@@ -118,6 +124,8 @@ export const blogPosts: BlogPost[] = [
     author: authors[1],
     publishedAt: "2025-01-05",
     readTime: 6,
+    views: 12350,
+    trending: true,
   },
   {
     id: "4",
@@ -130,6 +138,8 @@ export const blogPosts: BlogPost[] = [
     author: authors[1],
     publishedAt: "2025-01-03",
     readTime: 4,
+    views: 5670,
+    trending: false,
   },
   {
     id: "5",
@@ -142,6 +152,8 @@ export const blogPosts: BlogPost[] = [
     author: authors[2],
     publishedAt: "2025-01-01",
     readTime: 8,
+    views: 9820,
+    trending: false,
   },
   {
     id: "6",
@@ -154,9 +166,10 @@ export const blogPosts: BlogPost[] = [
     author: authors[0],
     publishedAt: "2024-12-28",
     readTime: 5,
+    views: 4230,
+    trending: false,
   },
 ];
-
 export const getBlogBySlug = (slug: string): BlogPost | undefined => {
   return blogPosts.find((post) => post.slug === slug);
 };
@@ -175,4 +188,29 @@ export const getFeaturedPosts = (count: number = 3): BlogPost[] => {
   const featured = blogPosts.filter((post) => post.featured);
   const remaining = blogPosts.filter((post) => !post.featured).slice(0, count - featured.length);
   return [...featured, ...remaining].slice(0, count);
+};
+
+export const getTrendingPosts = (count: number = 5): BlogPost[] => {
+  return blogPosts.filter((post) => post.trending).slice(0, count);
+};
+
+export const getMostViewedPosts = (count: number = 5): BlogPost[] => {
+  return [...blogPosts].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, count);
+};
+
+export type SortOption = "latest" | "oldest" | "trending" | "most-viewed";
+
+export const getSortedPosts = (posts: BlogPost[], sortBy: SortOption): BlogPost[] => {
+  switch (sortBy) {
+    case "latest":
+      return [...posts].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+    case "oldest":
+      return [...posts].sort((a, b) => new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime());
+    case "trending":
+      return [...posts].sort((a, b) => (b.trending ? 1 : 0) - (a.trending ? 1 : 0));
+    case "most-viewed":
+      return [...posts].sort((a, b) => (b.views || 0) - (a.views || 0));
+    default:
+      return posts;
+  }
 };
