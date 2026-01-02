@@ -2,12 +2,15 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useLanguage } from "@/contexts/LanguageContext";
 import gsap from "gsap";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,10 +32,10 @@ const Header = () => {
   }, [isMenuOpen]);
 
   const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Explore Blogs", path: "/explore" },
-    { name: "About", path: "/about" },
-    { name: "Contact", path: "/contact" },
+    { name: t.nav.home, path: "/" },
+    { name: t.nav.exploreBlogs, path: "/explore" },
+    { name: t.nav.about, path: "/about" },
+    { name: t.nav.contact, path: "/contact" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -76,14 +79,16 @@ const Header = () => {
               <Search className="h-5 w-5" />
             </Button>
 
+            <LanguageSwitcher />
+
             <Link to="/signin" className="hidden sm:block">
               <Button variant="ghost" size="sm">
-                Sign In
+                {t.nav.signIn}
               </Button>
             </Link>
 
             <Link to="/signup" className="hidden sm:block">
-              <Button size="sm">Subscribe</Button>
+              <Button size="sm">{t.nav.subscribe}</Button>
             </Link>
 
             {/* Mobile Menu Toggle */}
@@ -118,10 +123,10 @@ const Header = () => {
             ))}
             <div className="mobile-menu-item pt-4 flex gap-3">
               <Link to="/signin" className="flex-1">
-                <Button variant="outline" className="w-full">Sign In</Button>
+                <Button variant="outline" className="w-full">{t.nav.signIn}</Button>
               </Link>
               <Link to="/signup" className="flex-1">
-                <Button className="w-full">Subscribe</Button>
+                <Button className="w-full">{t.nav.subscribe}</Button>
               </Link>
             </div>
           </div>
