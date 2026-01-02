@@ -4,11 +4,13 @@ import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
 import SortFilter from "@/components/blog/SortFilter";
 import { blogPosts, categories, getSortedPosts, SortOption } from "@/data/blogData";
+import { useLanguage } from "@/contexts/LanguageContext";
 import gsap from "gsap";
 
 const ExploreBlogs = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [sortBy, setSortBy] = useState<SortOption>("latest");
+  const { t } = useLanguage();
   const cardsRef = useRef<HTMLDivElement>(null);
 
   const filteredPosts = activeCategory === "all"
@@ -40,10 +42,10 @@ const ExploreBlogs = () => {
       <section className="gradient-hero py-12 md:py-16">
         <div className="container text-center">
           <h1 className="font-heading text-4xl md:text-5xl font-bold mb-4">
-            Explore Blogs
+            {t.explore.title}
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Discover insightful articles across various topics. Filter and sort to find exactly what you're looking for.
+            {t.explore.subtitle}
           </p>
         </div>
       </section>
