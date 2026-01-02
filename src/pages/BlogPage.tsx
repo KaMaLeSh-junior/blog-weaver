@@ -1,12 +1,14 @@
 import { useParams, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AdSpace from "@/components/blog/AdSpace";
 import BlogCard from "@/components/blog/BlogCard";
-import { getBlogBySlug, blogPosts } from "@/data/blogData";
+import CategoryFilter from "@/components/blog/CategoryFilter";
+import SortFilter from "@/components/blog/SortFilter";
+import { getBlogBySlug, blogPosts, getSortedPosts, categories, SortOption } from "@/data/blogData";
 import { formatDate } from "@/lib/utils";
-import { useEffect } from "react";
 import gsap from "gsap";
 import { Clock, Share2, Bookmark, Facebook, Twitter, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +16,18 @@ import { Button } from "@/components/ui/button";
 const BlogPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const post = getBlogBySlug(slug || "");
-  const relatedPosts = blogPosts.filter((p) => p.id !== post?.id).slice(0, 3);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [sortBy, setSortBy] = useState<SortOption>("latest");
+
+  const filteredRelatedPosts = activeCategory === "all"
+    ? blogPosts.filter((p) => p.id !== post?.id)
+    : blogPosts.filter(
+        (p) =>
+          p.id !== post?.id &&
+          p.category.toLowerCase() === categories.find((c) => c.slug === activeCategory)?.name.toLowerCase()
+      );
+
+  const relatedPosts = getSortedPosts(filteredRelatedPosts, sortBy).slice(0, 6);
 
   useEffect(() => {
     if (post) {
@@ -142,11 +155,22 @@ const BlogPage = () => {
         </div>
       </article>
 
-      {/* Related Posts */}
+      {/* Related Posts with Filters */}
       <section className="bg-secondary/30 py-16">
         <div className="container">
-          <h2 className="font-heading text-2xl font-bold mb-8">Related Articles</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <h2 className="font-heading text-2xl font-bold">Related Articles</h2>
+            <div className="flex items-center gap-4">
+              <SortFilter value={sortBy} onChange={setSortBy} />
+            </div>
+          </div>
+          <div className="mb-8">
+            <CategoryFilter
+              activeCategory={activeCategory}
+              onCategoryChange={setActiveCategory}
+            />
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {relatedPosts.map((relPost) => (
               <BlogCard key={relPost.id} post={relPost} />
             ))}

@@ -3,7 +3,8 @@ import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
 import AdSpace from "@/components/blog/AdSpace";
-import { blogPosts, getFeaturedPosts, categories } from "@/data/blogData";
+import TrendingSidebar from "@/components/blog/TrendingSidebar";
+import { blogPosts, getFeaturedPosts, getTrendingPosts, getMostViewedPosts, categories } from "@/data/blogData";
 import {
   Carousel,
   CarouselContent,
@@ -117,6 +118,24 @@ const Index = () => {
             activeCategory={activeCategory}
             onCategoryChange={setActiveCategory}
           />
+        </div>
+      </section>
+
+      {/* Trending & Most Viewed Section */}
+      <section className="py-12 bg-secondary/20">
+        <div className="container">
+          <div className="grid lg:grid-cols-2 gap-8">
+            <TrendingSidebar
+              trendingPosts={getTrendingPosts(4)}
+              mostViewedPosts={[]}
+              title="Trending Now"
+            />
+            <TrendingSidebar
+              trendingPosts={[]}
+              mostViewedPosts={getMostViewedPosts(4)}
+              title="Most Viewed"
+            />
+          </div>
         </div>
       </section>
 
