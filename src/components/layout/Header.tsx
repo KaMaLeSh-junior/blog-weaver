@@ -1,16 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Search, ChevronDown } from "lucide-react";
+import { Menu, X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { categories } from "@/data/blogData";
 import gsap from "gsap";
 
 const Header = () => {
@@ -39,7 +30,7 @@ const Header = () => {
 
   const navLinks = [
     { name: "Home", path: "/" },
-    { name: "Explore Blogs", path: "/categories", hasDropdown: true },
+    { name: "Explore Blogs", path: "/explore" },
     { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];
@@ -66,49 +57,17 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1">
-            <NavigationMenu>
-              <NavigationMenuList>
-                {navLinks.map((link) =>
-                  link.hasDropdown ? (
-                    <NavigationMenuItem key={link.name}>
-                      <NavigationMenuTrigger className="bg-transparent hover:bg-secondary/50">
-                        {link.name}
-                      </NavigationMenuTrigger>
-                      <NavigationMenuContent>
-                        <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2">
-                          {categories.map((category) => (
-                            <li key={category.id}>
-                              <NavigationMenuLink asChild>
-                                <Link
-                                  to={`/category/${category.slug}`}
-                                  className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-secondary focus:bg-secondary"
-                                >
-                                  <div className="text-sm font-medium leading-none">{category.name}</div>
-                                  <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                                    {category.description}
-                                  </p>
-                                </Link>
-                              </NavigationMenuLink>
-                            </li>
-                          ))}
-                        </ul>
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                  ) : (
-                    <NavigationMenuItem key={link.name}>
-                      <Link
-                        to={link.path}
-                        className={`group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary/50 focus:bg-secondary/50 focus:outline-none ${
-                          isActive(link.path) ? "text-primary" : "text-foreground"
-                        }`}
-                      >
-                        {link.name}
-                      </Link>
-                    </NavigationMenuItem>
-                  )
-                )}
-              </NavigationMenuList>
-            </NavigationMenu>
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.path}
+                className={`inline-flex h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary/50 focus:bg-secondary/50 focus:outline-none ${
+                  isActive(link.path) ? "text-primary" : "text-foreground"
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
           </nav>
 
           {/* Right Side Actions */}
@@ -146,35 +105,15 @@ const Header = () => {
           <div className="container py-6 space-y-4">
             {navLinks.map((link) => (
               <div key={link.name} className="mobile-menu-item">
-                {link.hasDropdown ? (
-                  <div className="space-y-2">
-                    <span className="font-medium text-foreground flex items-center gap-1">
-                      {link.name} <ChevronDown className="h-4 w-4" />
-                    </span>
-                    <div className="pl-4 space-y-2">
-                      {categories.map((category) => (
-                        <Link
-                          key={category.id}
-                          to={`/category/${category.slug}`}
-                          className="block text-muted-foreground hover:text-primary transition-colors"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          {category.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <Link
-                    to={link.path}
-                    className={`block font-medium transition-colors ${
-                      isActive(link.path) ? "text-primary" : "text-foreground hover:text-primary"
-                    }`}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {link.name}
-                  </Link>
-                )}
+                <Link
+                  to={link.path}
+                  className={`block font-medium transition-colors ${
+                    isActive(link.path) ? "text-primary" : "text-foreground hover:text-primary"
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.name}
+                </Link>
               </div>
             ))}
             <div className="mobile-menu-item pt-4 flex gap-3">
