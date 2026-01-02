@@ -39,7 +39,7 @@ const Header = () => {
 
   const navLinks = [
     { name: "Home", path: "/" },
-    { name: "Categories", path: "/categories", hasDropdown: true },
+    { name: "Explore Blogs", path: "/categories", hasDropdown: true },
     { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];
