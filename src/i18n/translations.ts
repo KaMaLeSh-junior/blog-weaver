@@ -8,6 +8,10 @@ export interface Translations {
     contact: string;
     signIn: string;
     subscribe: string;
+    search: string;
+    blogs: string;
+    menu: string;
+    language: string;
   };
   hero: {
     featured: string;
@@ -63,6 +67,10 @@ export const translations: Record<Language, Translations> = {
       contact: "Contact",
       signIn: "Sign In",
       subscribe: "Subscribe",
+      search: "Search",
+      blogs: "Blogs",
+      menu: "Menu",
+      language: "Language",
     },
     hero: {
       featured: "Featured",
@@ -116,6 +124,10 @@ export const translations: Record<Language, Translations> = {
       contact: "Contact",
       signIn: "Connexion",
       subscribe: "S'abonner",
+      search: "Rechercher",
+      blogs: "Blogs",
+      menu: "Menu",
+      language: "Langue",
     },
     hero: {
       featured: "À la Une",
@@ -169,6 +181,10 @@ export const translations: Record<Language, Translations> = {
       contact: "Contacto",
       signIn: "Iniciar Sesión",
       subscribe: "Suscribirse",
+      search: "Buscar",
+      blogs: "Blogs",
+      menu: "Menú",
+      language: "Idioma",
     },
     hero: {
       featured: "Destacado",
