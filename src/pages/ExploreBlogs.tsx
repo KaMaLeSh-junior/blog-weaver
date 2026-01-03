@@ -5,6 +5,8 @@ import CategoryFilter from "@/components/blog/CategoryFilter";
 import SortFilter from "@/components/blog/SortFilter";
 import { blogPosts, categories, getSortedPosts, SortOption } from "@/data/blogData";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { Loader2 } from "lucide-react";
 import gsap from "gsap";
 
 const ExploreBlogs = () => {
@@ -22,6 +24,11 @@ const ExploreBlogs = () => {
 
   const sortedPosts = getSortedPosts(filteredPosts, sortBy);
 
+  const { displayedItems, hasMore, isLoading, loaderRef, totalItems } = useInfiniteScroll({
+    items: sortedPosts,
+    itemsPerPage: 6,
+  });
+
   useEffect(() => {
     if (cardsRef.current) {
       const cards = cardsRef.current.querySelectorAll(".blog-card");
@@ -31,7 +38,7 @@ const ExploreBlogs = () => {
         { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: "power2.out" }
       );
     }
-  }, [activeCategory, sortBy]);
+  }, [displayedItems, activeCategory, sortBy]);
 
   return (
     <Layout
@@ -65,22 +72,37 @@ const ExploreBlogs = () => {
         </div>
       </section>
 
-      {/* Blog Grid */}
-      <section className="py-12" ref={cardsRef}>
+      {/* Blog Grid with Infinite Scroll */}
+      <section className="py-12">
         <div className="container">
           <div className="flex items-center justify-between mb-8">
             <p className="text-muted-foreground">
-              Showing <span className="font-medium text-foreground">{sortedPosts.length}</span> articles
+              Showing <span className="font-medium text-foreground">{displayedItems.length}</span> of{" "}
+              <span className="font-medium text-foreground">{totalItems}</span> articles
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sortedPosts.map((post) => (
+          <div ref={cardsRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {displayedItems.map((post) => (
               <div key={post.id} className="blog-card">
                 <BlogCard post={post} />
               </div>
             ))}
           </div>
-          {sortedPosts.length === 0 && (
+          
+          {/* Infinite Scroll Loader */}
+          <div ref={loaderRef} className="flex justify-center py-8">
+            {isLoading && (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                <span>Loading more articles...</span>
+              </div>
+            )}
+            {!hasMore && displayedItems.length > 0 && (
+              <p className="text-muted-foreground text-sm">You've reached the end</p>
+            )}
+          </div>
+          
+          {displayedItems.length === 0 && (
             <div className="text-center py-16">
               <p className="text-muted-foreground text-lg">No articles found for this category.</p>
             </div>
