@@ -4,6 +4,7 @@ import { authors } from "@/data/blogData";
 import { useEffect } from "react";
 import gsap from "gsap";
 import { Users, BookOpen, Globe, Award } from "lucide-react";
+import AdSpace from "@/components/blog/AdSpace";
 
 const About = () => {
   useEffect(() => {
@@ -54,7 +55,10 @@ const About = () => {
         </div>
       </section>
 
-      {/* Mission */}
+      {/* Ad Space */}
+      <section className="container py-8 about-section">
+        <AdSpace variant="horizontal" />
+      </section>
       <section className="py-16 bg-secondary/30 about-section">
         <div className="container">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -117,6 +121,11 @@ const About = () => {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Bottom Ad Space */}
+      <section className="container py-8 about-section">
+        <AdSpace variant="horizontal" />
       </section>
     </Layout>
   );

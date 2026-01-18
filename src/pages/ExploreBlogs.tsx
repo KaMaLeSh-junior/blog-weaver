@@ -3,6 +3,7 @@ import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
 import SortFilter from "@/components/blog/SortFilter";
+import AdSpace from "@/components/blog/AdSpace";
 import { blogPosts, categories, getSortedPosts, SortOption } from "@/data/blogData";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
@@ -72,6 +73,11 @@ const ExploreBlogs = () => {
         </div>
       </section>
 
+      {/* Top Ad Space */}
+      <section className="container py-6">
+        <AdSpace variant="horizontal" />
+      </section>
+
       {/* Blog Grid with Infinite Scroll */}
       <section className="py-12">
         <div className="container">
@@ -81,12 +87,39 @@ const ExploreBlogs = () => {
               <span className="font-medium text-foreground">{totalItems}</span> articles
             </p>
           </div>
-          <div ref={cardsRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayedItems.map((post) => (
-              <div key={post.id} className="blog-card">
-                <BlogCard post={post} />
+          
+          <div className="grid lg:grid-cols-4 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-3">
+              <div ref={cardsRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {displayedItems.slice(0, 6).map((post) => (
+                  <div key={post.id} className="blog-card">
+                    <BlogCard post={post} />
+                  </div>
+                ))}
               </div>
-            ))}
+              
+              {/* Mid-Content Ad */}
+              {displayedItems.length > 6 && (
+                <div className="my-8">
+                  <AdSpace variant="horizontal" />
+                </div>
+              )}
+              
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {displayedItems.slice(6).map((post) => (
+                  <div key={post.id} className="blog-card">
+                    <BlogCard post={post} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Sidebar Ads */}
+            <div className="lg:col-span-1 space-y-6">
+              <AdSpace variant="square" />
+              <AdSpace variant="vertical" />
+            </div>
           </div>
           
           {/* Infinite Scroll Loader */}
@@ -108,6 +141,11 @@ const ExploreBlogs = () => {
             </div>
           )}
         </div>
+      </section>
+      
+      {/* Bottom Ad Space */}
+      <section className="container pb-12">
+        <AdSpace variant="horizontal" />
       </section>
     </Layout>
   );

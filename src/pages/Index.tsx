@@ -241,7 +241,22 @@ const Index = () => {
       <section className="py-12">
         <div className="container">
           <div ref={cardsRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayedItems.map((post) => (
+            {displayedItems.slice(0, 3).map((post) => (
+              <div key={post.id} className="blog-card">
+                <BlogCard post={post} />
+              </div>
+            ))}
+          </div>
+          
+          {/* Mid-Content Ad */}
+          {displayedItems.length > 3 && (
+            <div className="my-8">
+              <AdSpace variant="horizontal" />
+            </div>
+          )}
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {displayedItems.slice(3).map((post) => (
               <div key={post.id} className="blog-card">
                 <BlogCard post={post} />
               </div>
