@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Search, Home, BookOpen, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Sheet,
@@ -88,6 +89,7 @@ const Header = () => {
                 <Search className="h-5 w-5" />
               </Button>
 
+              <ThemeToggle />
               <LanguageSwitcher />
 
               <Link to="/signin" className="hidden sm:block">
@@ -176,6 +178,10 @@ const Header = () => {
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-sm text-muted-foreground">{t.nav.language}</span>
                     <LanguageSwitcher />
+                  </div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm text-muted-foreground">Theme</span>
+                    <ThemeToggle />
                   </div>
                 </div>
 
