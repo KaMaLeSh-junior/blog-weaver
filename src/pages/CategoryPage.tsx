@@ -90,13 +90,30 @@ const CategoryPage = () => {
             {/* Main Content */}
             <div className="lg:col-span-2">
               {sortedPosts.length > 0 ? (
-                <div className="grid md:grid-cols-2 gap-6">
-                  {sortedPosts.map((post) => (
-                    <div key={post.id} className="category-card">
-                      <BlogCard post={post} />
+                <>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {sortedPosts.slice(0, 4).map((post) => (
+                      <div key={post.id} className="category-card">
+                        <BlogCard post={post} />
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Mid-Content Ad */}
+                  {sortedPosts.length > 4 && (
+                    <div className="my-8">
+                      <AdSpace variant="horizontal" />
                     </div>
-                  ))}
-                </div>
+                  )}
+                  
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {sortedPosts.slice(4).map((post) => (
+                      <div key={post.id} className="category-card">
+                        <BlogCard post={post} />
+                      </div>
+                    ))}
+                  </div>
+                </>
               ) : (
                 <div className="text-center py-12">
                   <p className="text-muted-foreground">No articles in this category yet.</p>
@@ -105,14 +122,21 @@ const CategoryPage = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 space-y-6">
               <TrendingSidebar
                 trendingPosts={trendingPosts}
                 mostViewedPosts={mostViewedPosts}
               />
+              <AdSpace variant="square" />
+              <AdSpace variant="vertical" />
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Bottom Ad Space */}
+      <section className="container pb-12">
+        <AdSpace variant="horizontal" />
       </section>
     </Layout>
   );

@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import gsap from "gsap";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
+import AdSpace from "@/components/blog/AdSpace";
 
 const Contact = () => {
   const [name, setName] = useState("");
@@ -141,6 +142,11 @@ const Contact = () => {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Bottom Ad Space */}
+      <section className="container py-8 contact-section">
+        <AdSpace variant="horizontal" />
       </section>
     </Layout>
   );
