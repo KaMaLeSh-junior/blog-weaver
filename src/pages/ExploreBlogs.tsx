@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
@@ -8,13 +8,25 @@ import { blogPosts, categories, getSortedPosts, SortOption } from "@/data/blogDa
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { Loader2 } from "lucide-react";
-import gsap from "gsap";
+import { motion, AnimatePresence } from "framer-motion";
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.05,
+      duration: 0.4,
+      ease: [0.25, 0.46, 0.45, 0.94] as const
+    }
+  })
+};
 
 const ExploreBlogs = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [sortBy, setSortBy] = useState<SortOption>("latest");
   const { t } = useLanguage();
-  const cardsRef = useRef<HTMLDivElement>(null);
 
   const filteredPosts = activeCategory === "all"
     ? blogPosts
@@ -29,17 +41,6 @@ const ExploreBlogs = () => {
     items: sortedPosts,
     itemsPerPage: 6,
   });
-
-  useEffect(() => {
-    if (cardsRef.current) {
-      const cards = cardsRef.current.querySelectorAll(".blog-card");
-      gsap.fromTo(
-        cards,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: "power2.out" }
-      );
-    }
-  }, [displayedItems, activeCategory, sortBy]);
 
   return (
     <Layout
@@ -91,13 +92,26 @@ const ExploreBlogs = () => {
           <div className="grid lg:grid-cols-4 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-3">
-              <div ref={cardsRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {displayedItems.slice(0, 6).map((post) => (
-                  <div key={post.id} className="blog-card">
-                    <BlogCard post={post} />
-                  </div>
-                ))}
-              </div>
+              <AnimatePresence mode="wait">
+                <motion.div 
+                  key={`${activeCategory}-${sortBy}`}
+                  className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {displayedItems.slice(0, 6).map((post, index) => (
+                    <motion.div 
+                      key={post.id} 
+                      custom={index}
+                      variants={cardVariants}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      <BlogCard post={post} />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
               
               {/* Mid-Content Ad */}
               {displayedItems.length > 6 && (
@@ -107,10 +121,16 @@ const ExploreBlogs = () => {
               )}
               
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {displayedItems.slice(6).map((post) => (
-                  <div key={post.id} className="blog-card">
+                {displayedItems.slice(6).map((post, index) => (
+                  <motion.div 
+                    key={post.id}
+                    custom={index + 6}
+                    variants={cardVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
                     <BlogCard post={post} />
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
