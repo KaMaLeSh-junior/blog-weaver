@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import { Helmet } from "react-helmet-async";
+import PageTransition from "./PageTransition";
 
 interface LayoutProps {
   children: ReactNode;
@@ -22,7 +23,9 @@ const Layout = ({ children, title = "Clarity Blog", description = "Your source f
       </Helmet>
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 pt-20">{children}</main>
+        <main className="flex-1 pt-20">
+          <PageTransition>{children}</PageTransition>
+        </main>
         <Footer />
       </div>
     </>
