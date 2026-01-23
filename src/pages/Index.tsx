@@ -14,18 +14,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { SkeletonCard } from "@/components/ui/skeleton-card";
+import { motion } from "framer-motion";
 
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [useCarousel] = useState(true);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
-  const categoriesRef = useRef<HTMLDivElement>(null);
-  const trendingRef = useRef<HTMLDivElement>(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const newsletterRef = useRef<HTMLDivElement>(null);
 
   const featuredPosts = getFeaturedPosts(4);
@@ -41,138 +36,35 @@ const Index = () => {
     itemsPerPage: 6,
   });
 
+  // Simulate initial loading
   useEffect(() => {
-    // Small delay to ensure DOM elements are rendered
     const timer = setTimeout(() => {
-      const ctx = gsap.context(() => {
-        // Hero animation with stagger
-        if (heroRef.current) {
-          gsap.fromTo(
-            heroRef.current,
-            { opacity: 0, y: 50 },
-            { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
-          );
-
-          // Parallax effect on hero
-          gsap.to(heroRef.current, {
-            yPercent: -10,
-            ease: "none",
-            scrollTrigger: {
-              trigger: heroRef.current,
-              start: "top top",
-              end: "bottom top",
-              scrub: true,
-            },
-          });
-        }
-
-        // Categories section animation
-        if (categoriesRef.current) {
-          const sectionHeader = categoriesRef.current.querySelector(".section-header");
-          if (sectionHeader) {
-            gsap.fromTo(
-              sectionHeader,
-              { opacity: 0, y: 30 },
-              {
-                opacity: 1,
-                y: 0,
-                duration: 0.8,
-                ease: "power2.out",
-                scrollTrigger: {
-                  trigger: categoriesRef.current,
-                  start: "top 85%",
-                },
-              }
-            );
-          }
-
-          const categoryBtns = categoriesRef.current.querySelectorAll(".category-btn");
-          if (categoryBtns.length > 0) {
-            gsap.fromTo(
-              categoryBtns,
-              { opacity: 0, scale: 0.8 },
-              {
-                opacity: 1,
-                scale: 1,
-                duration: 0.5,
-                stagger: 0.08,
-                ease: "back.out(1.7)",
-                scrollTrigger: {
-                  trigger: categoriesRef.current,
-                  start: "top 80%",
-                },
-              }
-            );
-          }
-        }
-
-        // Trending section animation
-        if (trendingRef.current) {
-          const trendingCards = trendingRef.current.querySelectorAll(".trending-card");
-          if (trendingCards.length > 0) {
-            gsap.fromTo(
-              trendingCards,
-              { opacity: 0, x: -30 },
-              {
-                opacity: 1,
-                x: 0,
-                duration: 0.6,
-                stagger: 0.1,
-                ease: "power2.out",
-                scrollTrigger: {
-                  trigger: trendingRef.current,
-                  start: "top 80%",
-                },
-              }
-            );
-          }
-        }
-
-        // Newsletter section animation
-        if (newsletterRef.current) {
-          gsap.fromTo(
-            newsletterRef.current,
-            { opacity: 0, y: 40, scale: 0.95 },
-            {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              duration: 0.8,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: newsletterRef.current,
-                start: "top 85%",
-              },
-            }
-          );
-        }
-      });
-
-      return () => ctx.revert();
-    }, 100);
-
+      setIsInitialLoading(false);
+    }, 500);
     return () => clearTimeout(timer);
   }, []);
 
-  // Animate new cards when they load
-  useEffect(() => {
-    if (cardsRef.current) {
-      const cards = cardsRef.current.querySelectorAll(".blog-card");
-      if (cards.length > 0) {
-        gsap.fromTo(
-          cards,
-          { opacity: 0, y: 40 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            stagger: 0.08,
-            ease: "power2.out",
-          }
-        );
-      }
-    }
-  }, [displayedItems, activeCategory]);
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut" as const,
+      },
+    },
+  };
 
   return (
     <Layout
@@ -180,9 +72,16 @@ const Index = () => {
       description="Discover insightful articles on technology, lifestyle, travel, health, and culture. Stay informed with Clarity Blog."
     >
       {/* Hero Section */}
-      <section className="gradient-hero py-12 md:py-16 overflow-hidden" ref={heroRef}>
+      <motion.section 
+        className="gradient-hero py-12 md:py-16 overflow-hidden"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
         <div className="container">
-          {useCarousel && featuredPosts.length > 1 ? (
+          {isInitialLoading ? (
+            <SkeletonCard variant="featured" />
+          ) : useCarousel && featuredPosts.length > 1 ? (
             <Carousel
               opts={{
                 align: "start",
@@ -206,17 +105,28 @@ const Index = () => {
             featuredPosts[0] && <BlogCard post={featuredPosts[0]} variant="featured" />
           )}
         </div>
-      </section>
+      </motion.section>
 
       {/* Ad Space */}
-      <section className="container py-8">
+      <motion.section 
+        className="container py-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
         <AdSpace variant="horizontal" />
-      </section>
+      </motion.section>
 
       {/* Categories Section */}
-      <section className="py-12 md:py-16" ref={categoriesRef}>
+      <motion.section 
+        className="py-12 md:py-16"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="container">
-          <div className="text-center mb-10 section-header">
+          <div className="text-center mb-10">
             <h2 className="font-heading text-3xl md:text-4xl font-bold mb-4">
               Browse by Category
             </h2>
@@ -229,55 +139,95 @@ const Index = () => {
             onCategoryChange={setActiveCategory}
           />
         </div>
-      </section>
+      </motion.section>
 
       {/* Trending & Most Viewed Section */}
-      <section className="py-12 bg-secondary/20" ref={trendingRef}>
+      <motion.section 
+        className="py-12 bg-secondary/20"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="container">
-          <div className="grid lg:grid-cols-2 gap-8">
-            <div className="trending-card">
+          <motion.div 
+            className="grid lg:grid-cols-2 gap-8"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <motion.div variants={itemVariants}>
               <TrendingSidebar
                 trendingPosts={getTrendingPosts(4)}
                 mostViewedPosts={[]}
                 title="Trending Now"
               />
-            </div>
-            <div className="trending-card">
+            </motion.div>
+            <motion.div variants={itemVariants}>
               <TrendingSidebar
                 trendingPosts={[]}
                 mostViewedPosts={getMostViewedPosts(4)}
                 title="Most Viewed"
               />
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Blog Grid with Infinite Scroll */}
       <section className="py-12">
         <div className="container">
-          <div ref={cardsRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayedItems.slice(0, 3).map((post) => (
-              <div key={post.id} className="blog-card">
-                <BlogCard post={post} />
-              </div>
-            ))}
-          </div>
-          
-          {/* Mid-Content Ad */}
-          {displayedItems.length > 3 && (
-            <div className="my-8">
-              <AdSpace variant="horizontal" />
+          {isInitialLoading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <SkeletonCard key={i} />
+              ))}
             </div>
+          ) : (
+            <>
+              <motion.div 
+                className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                {displayedItems.slice(0, 3).map((post) => (
+                  <motion.div key={post.id} variants={itemVariants}>
+                    <BlogCard post={post} />
+                  </motion.div>
+                ))}
+              </motion.div>
+              
+              {/* Mid-Content Ad */}
+              {displayedItems.length > 3 && (
+                <motion.div 
+                  className="my-8"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <AdSpace variant="horizontal" />
+                </motion.div>
+              )}
+              
+              <motion.div 
+                className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                {displayedItems.slice(3).map((post) => (
+                  <motion.div key={post.id} variants={itemVariants}>
+                    <BlogCard post={post} />
+                  </motion.div>
+                ))}
+              </motion.div>
+            </>
           )}
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayedItems.slice(3).map((post) => (
-              <div key={post.id} className="blog-card">
-                <BlogCard post={post} />
-              </div>
-            ))}
-          </div>
           
           {/* Infinite Scroll Loader */}
           <div ref={loaderRef} className="flex justify-center py-8">
@@ -295,7 +245,13 @@ const Index = () => {
       </section>
 
       {/* Newsletter & Ad Section */}
-      <section className="py-16 bg-secondary/30">
+      <motion.section 
+        className="py-16 bg-secondary/30"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="container">
           <div className="grid lg:grid-cols-3 gap-8" ref={newsletterRef}>
             <div className="lg:col-span-2">
@@ -327,7 +283,7 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
     </Layout>
   );
 };
