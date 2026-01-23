@@ -31,11 +31,18 @@ const Header = () => {
 
   useEffect(() => {
     if (isSheetOpen) {
-      gsap.fromTo(
-        ".sheet-menu-item",
-        { opacity: 0, x: -20 },
-        { opacity: 1, x: 0, stagger: 0.1, duration: 0.3, ease: "power2.out" }
-      );
+      // Small delay to ensure sheet content is rendered
+      const timer = setTimeout(() => {
+        const menuItems = document.querySelectorAll(".sheet-menu-item");
+        if (menuItems.length > 0) {
+          gsap.fromTo(
+            menuItems,
+            { opacity: 0, x: -20 },
+            { opacity: 1, x: 0, stagger: 0.1, duration: 0.3, ease: "power2.out" }
+          );
+        }
+      }, 50);
+      return () => clearTimeout(timer);
     }
   }, [isSheetOpen]);
 

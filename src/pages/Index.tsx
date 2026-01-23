@@ -42,119 +42,135 @@ const Index = () => {
   });
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Hero animation with stagger
-      if (heroRef.current) {
-        gsap.fromTo(
-          heroRef.current,
-          { opacity: 0, y: 50 },
-          { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
-        );
+    // Small delay to ensure DOM elements are rendered
+    const timer = setTimeout(() => {
+      const ctx = gsap.context(() => {
+        // Hero animation with stagger
+        if (heroRef.current) {
+          gsap.fromTo(
+            heroRef.current,
+            { opacity: 0, y: 50 },
+            { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
+          );
 
-        // Parallax effect on hero
-        gsap.to(heroRef.current, {
-          yPercent: -10,
-          ease: "none",
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-          },
-        });
-      }
-
-      // Categories section animation
-      if (categoriesRef.current) {
-        gsap.fromTo(
-          categoriesRef.current.querySelector(".section-header"),
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "power2.out",
+          // Parallax effect on hero
+          gsap.to(heroRef.current, {
+            yPercent: -10,
+            ease: "none",
             scrollTrigger: {
-              trigger: categoriesRef.current,
-              start: "top 85%",
+              trigger: heroRef.current,
+              start: "top top",
+              end: "bottom top",
+              scrub: true,
             },
-          }
-        );
+          });
+        }
 
-        gsap.fromTo(
-          categoriesRef.current.querySelectorAll(".category-btn"),
-          { opacity: 0, scale: 0.8 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 0.5,
-            stagger: 0.08,
-            ease: "back.out(1.7)",
-            scrollTrigger: {
-              trigger: categoriesRef.current,
-              start: "top 80%",
-            },
+        // Categories section animation
+        if (categoriesRef.current) {
+          const sectionHeader = categoriesRef.current.querySelector(".section-header");
+          if (sectionHeader) {
+            gsap.fromTo(
+              sectionHeader,
+              { opacity: 0, y: 30 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power2.out",
+                scrollTrigger: {
+                  trigger: categoriesRef.current,
+                  start: "top 85%",
+                },
+              }
+            );
           }
-        );
-      }
 
-      // Trending section animation
-      if (trendingRef.current) {
-        gsap.fromTo(
-          trendingRef.current.querySelectorAll(".trending-card"),
-          { opacity: 0, x: -30 },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 0.6,
-            stagger: 0.1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: trendingRef.current,
-              start: "top 80%",
-            },
+          const categoryBtns = categoriesRef.current.querySelectorAll(".category-btn");
+          if (categoryBtns.length > 0) {
+            gsap.fromTo(
+              categoryBtns,
+              { opacity: 0, scale: 0.8 },
+              {
+                opacity: 1,
+                scale: 1,
+                duration: 0.5,
+                stagger: 0.08,
+                ease: "back.out(1.7)",
+                scrollTrigger: {
+                  trigger: categoriesRef.current,
+                  start: "top 80%",
+                },
+              }
+            );
           }
-        );
-      }
+        }
 
-      // Newsletter section animation
-      if (newsletterRef.current) {
-        gsap.fromTo(
-          newsletterRef.current,
-          { opacity: 0, y: 40, scale: 0.95 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.8,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: newsletterRef.current,
-              start: "top 85%",
-            },
+        // Trending section animation
+        if (trendingRef.current) {
+          const trendingCards = trendingRef.current.querySelectorAll(".trending-card");
+          if (trendingCards.length > 0) {
+            gsap.fromTo(
+              trendingCards,
+              { opacity: 0, x: -30 },
+              {
+                opacity: 1,
+                x: 0,
+                duration: 0.6,
+                stagger: 0.1,
+                ease: "power2.out",
+                scrollTrigger: {
+                  trigger: trendingRef.current,
+                  start: "top 80%",
+                },
+              }
+            );
           }
-        );
-      }
-    });
+        }
 
-    return () => ctx.revert();
+        // Newsletter section animation
+        if (newsletterRef.current) {
+          gsap.fromTo(
+            newsletterRef.current,
+            { opacity: 0, y: 40, scale: 0.95 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.8,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: newsletterRef.current,
+                start: "top 85%",
+              },
+            }
+          );
+        }
+      });
+
+      return () => ctx.revert();
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Animate new cards when they load
   useEffect(() => {
     if (cardsRef.current) {
       const cards = cardsRef.current.querySelectorAll(".blog-card");
-      gsap.fromTo(
-        cards,
-        { opacity: 0, y: 40 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          stagger: 0.08,
-          ease: "power2.out",
-        }
-      );
+      if (cards.length > 0) {
+        gsap.fromTo(
+          cards,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.08,
+            ease: "power2.out",
+          }
+        );
+      }
     }
   }, [displayedItems, activeCategory]);
 
