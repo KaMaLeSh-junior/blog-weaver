@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import DOMPurify from "dompurify";
 import Layout from "@/components/layout/Layout";
 import { Badge } from "@/components/ui/badge";
@@ -8,11 +8,20 @@ import AdSpace from "@/components/blog/AdSpace";
 import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
 import SortFilter from "@/components/blog/SortFilter";
+import ImageCarousel from "@/components/blog/ImageCarousel";
 import { getBlogBySlug, blogPosts, getSortedPosts, categories, SortOption } from "@/data/blogData";
 import { formatDate } from "@/lib/utils";
 import gsap from "gsap";
 import { Clock, Share2, Bookmark, Facebook, Twitter, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+// Helper to get all images from a post
+const getPostImages = (post: { image: string; images?: string[] }): string[] => {
+  if (post.images && post.images.length > 0) {
+    return post.images;
+  }
+  return [post.image];
+};
 
 const BlogPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -56,14 +65,10 @@ const BlogPage = () => {
       title={`${post.title} - Clarity Blog`}
       description={post.excerpt}
     >
-      {/* Hero Image */}
+      {/* Hero Image Carousel */}
       <div className="w-full h-[40vh] md:h-[50vh] relative">
-        <img
-          src={post.image}
-          alt={post.title}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+        <ImageCarousel images={getPostImages(post)} alt={post.title} />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent pointer-events-none" />
       </div>
 
       <article className="container blog-content">
