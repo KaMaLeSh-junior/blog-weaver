@@ -3,23 +3,31 @@ import { BlogPost } from "@/data/blogData";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/utils";
+import ImageCarousel from "./ImageCarousel";
 
 interface BlogCardProps {
   post: BlogPost;
   variant?: "default" | "horizontal" | "featured";
 }
 
+// Helper to get all images from a post
+const getPostImages = (post: BlogPost): string[] => {
+  if (post.images && post.images.length > 0) {
+    return post.images;
+  }
+  return [post.image];
+};
+
 const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
+  const images = getPostImages(post);
+
   if (variant === "featured") {
     return (
       <article className="group grid md:grid-cols-2 gap-8 bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
-        <Link to={`/blog/${post.slug}`} className="overflow-hidden">
-          <img
-            src={post.image}
-            alt={post.title}
-            className="w-full h-64 md:h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        </Link>
+        <div className="overflow-hidden h-64 md:h-80 relative">
+          <ImageCarousel images={images} alt={post.title} />
+          <Link to={`/blog/${post.slug}`} className="absolute inset-0 z-0" />
+        </div>
         <div className="flex flex-col justify-center p-6 md:p-8 md:pr-12">
           <Link to={`/category/${post.category.toLowerCase()}`}>
             <Badge variant="secondary" className="w-fit mb-4 hover:bg-primary hover:text-primary-foreground transition-colors">
@@ -52,13 +60,10 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
   if (variant === "horizontal") {
     return (
       <article className="group flex gap-4 bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
-        <Link to={`/blog/${post.slug}`} className="w-1/3 min-w-[120px] overflow-hidden">
-          <img
-            src={post.image}
-            alt={post.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        </Link>
+        <div className="w-1/3 min-w-[120px] overflow-hidden relative">
+          <ImageCarousel images={images} alt={post.title} />
+          <Link to={`/blog/${post.slug}`} className="absolute inset-0 z-0" />
+        </div>
         <div className="flex-1 py-4 pr-4">
           <Link to={`/category/${post.category.toLowerCase()}`}>
             <Badge variant="outline" className="mb-2 text-xs">
@@ -80,13 +85,10 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
 
   return (
     <article className="group bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
-      <Link to={`/blog/${post.slug}`} className="block overflow-hidden">
-        <img
-          src={post.image}
-          alt={post.title}
-          className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      </Link>
+      <div className="block overflow-hidden h-48 relative">
+        <ImageCarousel images={images} alt={post.title} />
+        <Link to={`/blog/${post.slug}`} className="absolute inset-0 z-0" />
+      </div>
       <div className="p-5">
         <Link to={`/category/${post.category.toLowerCase()}`}>
           <Badge variant="secondary" className="mb-3 hover:bg-primary hover:text-primary-foreground transition-colors">

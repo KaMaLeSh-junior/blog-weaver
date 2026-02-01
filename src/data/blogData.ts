@@ -19,6 +19,7 @@ export interface BlogPost {
   excerpt: string;
   content: string;
   image: string;
+  images?: string[]; // Multiple images for carousel
   category: string;
   author: Author;
   publishedAt: string;
@@ -91,6 +92,7 @@ export const blogPosts: BlogPost[] = [
       <p>By following this guide, you'll be well on your way to mastering these essential skills. Remember, practice makes perfect!</p>
     `,
     image: heroImage,
+    images: [heroImage, techImage, travelImage],
     category: "Lifestyle",
     author: authors[0],
     publishedAt: "2025-01-10",
@@ -106,6 +108,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: "Discover groundbreaking architectural concepts that maximize your living space while maintaining aesthetic appeal.",
     content: `<p>Architecture is evolving rapidly with new technologies and design philosophies...</p>`,
     image: techImage,
+    images: [techImage, lifestyleImage],
     category: "Technology",
     author: authors[0],
     publishedAt: "2025-01-08",
@@ -120,6 +123,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: "Experience the breathtaking beauty of natural ice caves and discover the best destinations for adventure seekers.",
     content: `<p>Ice caves are among nature's most spectacular creations...</p>`,
     image: travelImage,
+    images: [travelImage, healthImage, cultureImage],
     category: "Travel",
     author: authors[1],
     publishedAt: "2025-01-05",
