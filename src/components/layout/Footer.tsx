@@ -13,7 +13,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-[hsl(222,47%,11%)] text-white dark:bg-[hsl(222,47%,6%)] dark:text-gray-100">
+    <footer className="bg-foreground text-primary-foreground dark:bg-card dark:text-card-foreground">
       {/* Newsletter Section */}
       <div className="border-b border-primary-foreground/10">
         <div className="container py-16">
