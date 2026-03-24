@@ -131,6 +131,22 @@ export const translations: Record<Language, Translations> = {
       search: "Search",
       loading: "Loading...",
     },
+    cookies: {
+      title: "We value your privacy",
+      description: "We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic. By clicking \"Accept All\", you consent to our use of cookies.",
+      acceptAll: "Accept All",
+      rejectAll: "Reject All",
+      manage: "Manage Preferences",
+      savePreferences: "Save Preferences",
+      necessary: "Necessary",
+      necessaryDesc: "Essential for the website to function properly",
+      analytics: "Analytics",
+      analyticsDesc: "Help us understand how visitors interact with our site",
+      marketing: "Marketing",
+      marketingDesc: "Used to deliver relevant advertisements",
+      functional: "Functional",
+      functionalDesc: "Enable personalized features and preferences",
+    },
   },
   fr: {
     nav: {
