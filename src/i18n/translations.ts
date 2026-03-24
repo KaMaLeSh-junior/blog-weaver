@@ -56,6 +56,22 @@ export interface Translations {
     search: string;
     loading: string;
   };
+  cookies: {
+    title: string;
+    description: string;
+    acceptAll: string;
+    rejectAll: string;
+    manage: string;
+    savePreferences: string;
+    necessary: string;
+    necessaryDesc: string;
+    analytics: string;
+    analyticsDesc: string;
+    marketing: string;
+    marketingDesc: string;
+    functional: string;
+    functionalDesc: string;
+  };
 }
 
 export const translations: Record<Language, Translations> = {
