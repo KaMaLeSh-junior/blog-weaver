@@ -15,7 +15,7 @@ const Footer = () => {
   return (
     <footer className="bg-foreground text-primary-foreground dark:bg-card dark:text-card-foreground">
       {/* Newsletter Section */}
-      <div className="border-b border-primary-foreground/10">
+      <div style={{display:"none"}} className="border-b border-primary-foreground/10">
         <div className="container py-16">
           <div className="max-w-2xl mx-auto text-center">
             <h3 className="font-heading text-3xl font-bold mb-4">

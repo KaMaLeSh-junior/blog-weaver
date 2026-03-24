@@ -4,7 +4,12 @@ import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
 import SortFilter from "@/components/blog/SortFilter";
 import AdSpace from "@/components/blog/AdSpace";
-import { blogPosts, categories, getSortedPosts, SortOption } from "@/data/blogData";
+import {
+  blogPosts,
+  categories,
+  getSortedPosts,
+  SortOption,
+} from "@/data/blogData";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { Loader2 } from "lucide-react";
@@ -18,29 +23,35 @@ const cardVariants = {
     transition: {
       delay: i * 0.05,
       duration: 0.4,
-      ease: [0.25, 0.46, 0.45, 0.94] as const
-    }
-  })
+      ease: [0.25, 0.46, 0.45, 0.94] as const,
+    },
+  }),
 };
 
 const ExploreBlogs = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [sortBy, setSortBy] = useState<SortOption>("latest");
   const { t } = useLanguage();
+  const advertiseState = false;
 
-  const filteredPosts = activeCategory === "all"
-    ? blogPosts
-    : blogPosts.filter(
-        (post) =>
-          post.category.toLowerCase() === categories.find((c) => c.slug === activeCategory)?.name.toLowerCase()
-      );
+  const filteredPosts =
+    activeCategory === "all"
+      ? blogPosts
+      : blogPosts.filter(
+          (post) =>
+            post.category.toLowerCase() ===
+            categories
+              .find((c) => c.slug === activeCategory)
+              ?.name.toLowerCase(),
+        );
 
   const sortedPosts = getSortedPosts(filteredPosts, sortBy);
 
-  const { displayedItems, hasMore, isLoading, loaderRef, totalItems } = useInfiniteScroll({
-    items: sortedPosts,
-    itemsPerPage: 6,
-  });
+  const { displayedItems, hasMore, isLoading, loaderRef, totalItems } =
+    useInfiniteScroll({
+      items: sortedPosts,
+      itemsPerPage: 6,
+    });
 
   return (
     <Layout
@@ -84,24 +95,29 @@ const ExploreBlogs = () => {
         <div className="container">
           <div className="flex items-center justify-between mb-8">
             <p className="text-muted-foreground">
-              Showing <span className="font-medium text-foreground">{displayedItems.length}</span> of{" "}
-              <span className="font-medium text-foreground">{totalItems}</span> articles
+              Showing{" "}
+              <span className="font-medium text-foreground">
+                {displayedItems.length}
+              </span>{" "}
+              of{" "}
+              <span className="font-medium text-foreground">{totalItems}</span>{" "}
+              articles
             </p>
           </div>
-          
+
           <div className="grid lg:grid-cols-4 gap-8">
             {/* Main Content */}
-            <div className="lg:col-span-3">
+            <div className={advertiseState ? "lg:col-span-3":"lg:col-span-4"}>
               <AnimatePresence mode="wait">
-                <motion.div 
+                <motion.div
                   key={`${activeCategory}-${sortBy}`}
                   className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
                   initial="hidden"
                   animate="visible"
                 >
                   {displayedItems.slice(0, 6).map((post, index) => (
-                    <motion.div 
-                      key={post.id} 
+                    <motion.div
+                      key={post.id}
                       custom={index}
                       variants={cardVariants}
                       initial="hidden"
@@ -112,17 +128,17 @@ const ExploreBlogs = () => {
                   ))}
                 </motion.div>
               </AnimatePresence>
-              
+
               {/* Mid-Content Ad */}
-              {displayedItems.length > 6 && (
+              {advertiseState && displayedItems.length > 6 && (
                 <div className="my-8">
                   <AdSpace variant="horizontal" />
                 </div>
               )}
-              
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+              <div className={`grid md:grid-cols-2 "lg:grid-cols-3" gap-6`}>
                 {displayedItems.slice(6).map((post, index) => (
-                  <motion.div 
+                  <motion.div
                     key={post.id}
                     custom={index + 6}
                     variants={cardVariants}
@@ -134,14 +150,16 @@ const ExploreBlogs = () => {
                 ))}
               </div>
             </div>
-            
+
             {/* Sidebar Ads */}
-            <div className="lg:col-span-1 space-y-6">
-              <AdSpace variant="square" />
-              <AdSpace variant="vertical" />
-            </div>
+            {advertiseState && (
+              <div className="lg:col-span-1 space-y-6">
+                <AdSpace variant="square" />
+                <AdSpace variant="vertical" />
+              </div>
+            )}
           </div>
-          
+
           {/* Infinite Scroll Loader */}
           <div ref={loaderRef} className="flex justify-center py-8">
             {isLoading && (
@@ -151,18 +169,22 @@ const ExploreBlogs = () => {
               </div>
             )}
             {!hasMore && displayedItems.length > 0 && (
-              <p className="text-muted-foreground text-sm">You've reached the end</p>
+              <p className="text-muted-foreground text-sm">
+                You've reached the end
+              </p>
             )}
           </div>
-          
+
           {displayedItems.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-muted-foreground text-lg">No articles found for this category.</p>
+              <p className="text-muted-foreground text-lg">
+                No articles found for this category.
+              </p>
             </div>
           )}
         </div>
       </section>
-      
+
       {/* Bottom Ad Space */}
       <section className="container pb-12">
         <AdSpace variant="horizontal" />
