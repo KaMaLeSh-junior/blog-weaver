@@ -30,6 +30,7 @@ const ExploreBlogs = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [sortBy, setSortBy] = useState<SortOption>("latest");
   const { t } = useLanguage();
+  const advertiseState = false;
 
   const { data: apiBlogs, isLoading: blogsLoading } = useAllBlogs();
   const { data: apiCategories } = useAllCategories();
@@ -71,10 +72,11 @@ const ExploreBlogs = () => {
     return getSortedPosts(filteredPosts, sortBy);
   }, [filteredPosts, sortBy, apiBlogs]);
 
-  const { displayedItems, hasMore, isLoading, loaderRef, totalItems } = useInfiniteScroll({
-    items: sortedPosts,
-    itemsPerPage: 6,
-  });
+  const { displayedItems, hasMore, isLoading, loaderRef, totalItems } =
+    useInfiniteScroll({
+      items: sortedPosts,
+      itemsPerPage: 6,
+    });
 
   return (
     <Layout
@@ -115,8 +117,13 @@ const ExploreBlogs = () => {
         <div className="container">
           <div className="flex items-center justify-between mb-8">
             <p className="text-muted-foreground">
-              Showing <span className="font-medium text-foreground">{displayedItems.length}</span> of{" "}
-              <span className="font-medium text-foreground">{totalItems}</span> articles
+              Showing{" "}
+              <span className="font-medium text-foreground">
+                {displayedItems.length}
+              </span>{" "}
+              of{" "}
+              <span className="font-medium text-foreground">{totalItems}</span>{" "}
+              articles
             </p>
           </div>
 
@@ -174,13 +181,17 @@ const ExploreBlogs = () => {
               </div>
             )}
             {!hasMore && displayedItems.length > 0 && (
-              <p className="text-muted-foreground text-sm">You've reached the end</p>
+              <p className="text-muted-foreground text-sm">
+                You've reached the end
+              </p>
             )}
           </div>
 
           {!blogsLoading && displayedItems.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-muted-foreground text-lg">No articles found for this category.</p>
+              <p className="text-muted-foreground text-lg">
+                No articles found for this category.
+              </p>
             </div>
           )}
         </div>

@@ -282,7 +282,7 @@ const Index = () => {
       >
         <div className="container">
           <div className="grid lg:grid-cols-3 gap-8" ref={newsletterRef}>
-            <div className="lg:col-span-2">
+            <div style={{display:"none"}} className="lg:col-span-2">
               <div className="bg-card rounded-2xl p-8 shadow-card">
                 <h3 className="font-heading text-2xl font-bold mb-4">Stay Updated</h3>
                 <p className="text-muted-foreground mb-6">
