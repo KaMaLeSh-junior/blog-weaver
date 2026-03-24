@@ -204,6 +204,22 @@ export const translations: Record<Language, Translations> = {
       search: "Rechercher",
       loading: "Chargement...",
     },
+    cookies: {
+      title: "Nous respectons votre vie privée",
+      description: "Nous utilisons des cookies pour améliorer votre expérience, proposer du contenu personnalisé et analyser notre trafic. En cliquant sur \"Tout accepter\", vous consentez à notre utilisation des cookies.",
+      acceptAll: "Tout accepter",
+      rejectAll: "Tout refuser",
+      manage: "Gérer les préférences",
+      savePreferences: "Enregistrer",
+      necessary: "Nécessaires",
+      necessaryDesc: "Essentiels au bon fonctionnement du site",
+      analytics: "Analytiques",
+      analyticsDesc: "Nous aident à comprendre comment les visiteurs interagissent",
+      marketing: "Marketing",
+      marketingDesc: "Utilisés pour diffuser des publicités pertinentes",
+      functional: "Fonctionnels",
+      functionalDesc: "Activent des fonctionnalités et préférences personnalisées",
+    },
   },
   es: {
     nav: {
