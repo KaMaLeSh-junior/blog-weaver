@@ -1,12 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { categories } from "@/data/blogData";
+import { categories as staticCategories, Category } from "@/data/blogData";
 
 interface CategoryFilterProps {
   activeCategory: string;
   onCategoryChange: (category: string) => void;
+  categories?: Category[];
 }
 
-const CategoryFilter = ({ activeCategory, onCategoryChange }: CategoryFilterProps) => {
+const CategoryFilter = ({
+  activeCategory,
+  onCategoryChange,
+  categories,
+}: CategoryFilterProps) => {
+  const cats = categories || staticCategories;
+
   return (
     <div className="flex flex-wrap justify-center gap-3">
       <Button
@@ -15,9 +22,9 @@ const CategoryFilter = ({ activeCategory, onCategoryChange }: CategoryFilterProp
         onClick={() => onCategoryChange("all")}
         className="rounded-full"
       >
-        All ({categories.reduce((acc, cat) => acc + cat.count, 0)})
+        All ({cats.reduce((acc, cat) => acc + cat.count, 0)})
       </Button>
-      {categories.map((category) => (
+      {cats.map((category) => (
         <Button
           key={category.id}
           variant={activeCategory === category.slug ? "default" : "outline"}

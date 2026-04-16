@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
 import AdSpace from "@/components/blog/AdSpace";
 import TrendingSidebar from "@/components/blog/TrendingSidebar";
-import { blogPosts, getFeaturedPosts, getTrendingPosts, getMostViewedPosts, categories } from "@/data/blogData";
+import { useAllBlogs, useAllCategories } from "@/hooks/useApi";
+import { mapApiBlogToPost, mapApiCategoryToCategory } from "@/utils/mappers";
+import { blogPosts as staticPosts, getFeaturedPosts, getTrendingPosts, getMostViewedPosts, categories as staticCategories } from "@/data/blogData";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { Loader2 } from "lucide-react";
 import {
@@ -20,37 +22,73 @@ import { motion } from "framer-motion";
 const Index = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [useCarousel] = useState(true);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const newsletterRef = useRef<HTMLDivElement>(null);
 
-  const featuredPosts = getFeaturedPosts(4);
-  const filteredPosts = activeCategory === "all"
-    ? blogPosts.filter((post) => !post.featured)
-    : blogPosts.filter(
-        (post) =>
-          post.category.toLowerCase() === categories.find((c) => c.slug === activeCategory)?.name.toLowerCase()
-      );
+  // API data
+  const { data: apiBlogs, isLoading: blogsLoading } = useAllBlogs();
+  const { data: apiCategories } = useAllCategories();
+
+  // Map API data to frontend types, fallback to static
+  const posts = useMemo(() => {
+    if (apiBlogs && apiBlogs.length > 0) {
+      return apiBlogs.filter(b => b.status === 1).map(mapApiBlogToPost);
+    }
+    return staticPosts;
+  }, [apiBlogs]);
+
+  const categories = useMemo(() => {
+    if (apiCategories && apiCategories.length > 0) {
+      return apiCategories
+        .filter(c => c.status === 1)
+        .map(c => {
+          const count = posts.filter(
+            p => p.category.toLowerCase() === c.name.toLowerCase()
+          ).length;
+          return mapApiCategoryToCategory(c, count);
+        });
+    }
+    return staticCategories;
+  }, [apiCategories, posts]);
+
+  // Featured = first 4 posts (API has no featured flag)
+  const featuredPosts = useMemo(() => {
+    if (apiBlogs && apiBlogs.length > 0) return posts.slice(0, 4);
+    return getFeaturedPosts(4);
+  }, [apiBlogs, posts]);
+
+  const filteredPosts = useMemo(() => {
+    const nonFeatured = apiBlogs && apiBlogs.length > 0
+      ? posts.slice(4)
+      : staticPosts.filter(p => !p.featured);
+
+    if (activeCategory === "all") return nonFeatured;
+    const cat = categories.find(c => c.slug === activeCategory);
+    if (!cat) return nonFeatured;
+    return nonFeatured.filter(
+      p => p.category.toLowerCase() === cat.name.toLowerCase()
+    );
+  }, [activeCategory, posts, categories, apiBlogs]);
+
+  const trendingPosts = useMemo(() => {
+    if (apiBlogs && apiBlogs.length > 0) return posts.slice(0, 4);
+    return getTrendingPosts(4);
+  }, [apiBlogs, posts]);
+
+  const mostViewedPosts = useMemo(() => {
+    if (apiBlogs && apiBlogs.length > 0) return posts.slice(0, 4);
+    return getMostViewedPosts(4);
+  }, [apiBlogs, posts]);
 
   const { displayedItems, hasMore, isLoading, loaderRef } = useInfiniteScroll({
     items: filteredPosts,
     itemsPerPage: 6,
   });
 
-  // Simulate initial loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsInitialLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
+      transition: { staggerChildren: 0.1 },
     },
   };
 
@@ -59,10 +97,7 @@ const Index = () => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut" as const,
-      },
+      transition: { duration: 0.5, ease: "easeOut" as const },
     },
   };
 
@@ -79,16 +114,10 @@ const Index = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="container">
-          {isInitialLoading ? (
+          {blogsLoading ? (
             <SkeletonCard variant="featured" />
           ) : useCarousel && featuredPosts.length > 1 ? (
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              className="w-full"
-            >
+            <Carousel opts={{ align: "start", loop: true }} className="w-full">
               <CarouselContent>
                 {featuredPosts.map((post) => (
                   <CarouselItem key={post.id}>
@@ -137,6 +166,7 @@ const Index = () => {
           <CategoryFilter
             activeCategory={activeCategory}
             onCategoryChange={setActiveCategory}
+            categories={categories}
           />
         </div>
       </motion.section>
@@ -159,7 +189,7 @@ const Index = () => {
           >
             <motion.div variants={itemVariants}>
               <TrendingSidebar
-                trendingPosts={getTrendingPosts(4)}
+                trendingPosts={trendingPosts}
                 mostViewedPosts={[]}
                 title="Trending Now"
               />
@@ -167,7 +197,7 @@ const Index = () => {
             <motion.div variants={itemVariants}>
               <TrendingSidebar
                 trendingPosts={[]}
-                mostViewedPosts={getMostViewedPosts(4)}
+                mostViewedPosts={mostViewedPosts}
                 title="Most Viewed"
               />
             </motion.div>
@@ -178,7 +208,7 @@ const Index = () => {
       {/* Blog Grid with Infinite Scroll */}
       <section className="py-12">
         <div className="container">
-          {isInitialLoading ? (
+          {blogsLoading ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <SkeletonCard key={i} />
@@ -200,7 +230,6 @@ const Index = () => {
                 ))}
               </motion.div>
               
-              {/* Mid-Content Ad */}
               {displayedItems.length > 3 && (
                 <motion.div 
                   className="my-8"
@@ -229,7 +258,6 @@ const Index = () => {
             </>
           )}
           
-          {/* Infinite Scroll Loader */}
           <div ref={loaderRef} className="flex justify-center py-8">
             {isLoading && (
               <div className="flex items-center gap-2 text-muted-foreground">
@@ -256,12 +284,9 @@ const Index = () => {
           <div className="grid lg:grid-cols-3 gap-8" ref={newsletterRef}>
             <div className="lg:col-span-2">
               <div className="bg-card rounded-2xl p-8 shadow-card">
-                <h3 className="font-heading text-2xl font-bold mb-4">
-                  Stay Updated
-                </h3>
+                <h3 className="font-heading text-2xl font-bold mb-4">Stay Updated</h3>
                 <p className="text-muted-foreground mb-6">
-                  Join our community and never miss an article. Get the latest
-                  insights delivered to your inbox weekly.
+                  Join our community and never miss an article. Get the latest insights delivered to your inbox weekly.
                 </p>
                 <form className="flex gap-3">
                   <input

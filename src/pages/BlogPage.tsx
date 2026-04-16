@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import DOMPurify from "dompurify";
 import Layout from "@/components/layout/Layout";
 import { Badge } from "@/components/ui/badge";
@@ -9,35 +9,71 @@ import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
 import SortFilter from "@/components/blog/SortFilter";
 import ImageCarousel from "@/components/blog/ImageCarousel";
-import { getBlogBySlug, blogPosts, getSortedPosts, categories, SortOption } from "@/data/blogData";
+import { useBlogBySlug, useAllBlogs, useAllCategories } from "@/hooks/useApi";
+import { mapApiBlogToPost, mapApiCategoryToCategory, getSortedApiPosts, SortOption } from "@/utils/mappers";
+import { getBlogBySlug, blogPosts as staticPosts, getSortedPosts, categories as staticCategories } from "@/data/blogData";
 import { formatDate } from "@/lib/utils";
 import gsap from "gsap";
 import { Clock, Share2, Bookmark, Facebook, Twitter, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-// Helper to get all images from a post
-const getPostImages = (post: { image: string; images?: string[] }): string[] => {
-  if (post.images && post.images.length > 0) {
-    return post.images;
-  }
-  return [post.image];
-};
+import { SkeletonCard } from "@/components/ui/skeleton-card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const BlogPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const post = getBlogBySlug(slug || "");
   const [activeCategory, setActiveCategory] = useState("all");
   const [sortBy, setSortBy] = useState<SortOption>("latest");
 
-  const filteredRelatedPosts = activeCategory === "all"
-    ? blogPosts.filter((p) => p.id !== post?.id)
-    : blogPosts.filter(
-        (p) =>
-          p.id !== post?.id &&
-          p.category.toLowerCase() === categories.find((c) => c.slug === activeCategory)?.name.toLowerCase()
-      );
+  // API data
+  const { data: apiBlog, isLoading: blogLoading } = useBlogBySlug(slug || "");
+  const { data: apiBlogs } = useAllBlogs();
+  const { data: apiCategories } = useAllCategories();
 
-  const relatedPosts = getSortedPosts(filteredRelatedPosts, sortBy).slice(0, 6);
+  // Map single blog
+  const post = useMemo(() => {
+    if (apiBlog) return mapApiBlogToPost(apiBlog);
+    return getBlogBySlug(slug || "") || null;
+  }, [apiBlog, slug]);
+
+  // Map all blogs for related posts
+  const allPosts = useMemo(() => {
+    if (apiBlogs && apiBlogs.length > 0) {
+      return apiBlogs.filter(b => b.status === 1).map(mapApiBlogToPost);
+    }
+    return staticPosts;
+  }, [apiBlogs]);
+
+  const categories = useMemo(() => {
+    if (apiCategories && apiCategories.length > 0) {
+      return apiCategories
+        .filter(c => c.status === 1)
+        .map(c => mapApiCategoryToCategory(c, 0));
+    }
+    return staticCategories;
+  }, [apiCategories]);
+
+  // Related posts
+  const relatedPosts = useMemo(() => {
+    const filtered = activeCategory === "all"
+      ? allPosts.filter(p => p.id !== post?.id)
+      : allPosts.filter(p => {
+          const cat = categories.find(c => c.slug === activeCategory);
+          return p.id !== post?.id && cat && p.category.toLowerCase() === cat.name.toLowerCase();
+        });
+    
+    const sorted = apiBlogs && apiBlogs.length > 0
+      ? getSortedApiPosts(filtered, sortBy)
+      : getSortedPosts(filtered, sortBy);
+    
+    return sorted.slice(0, 6);
+  }, [activeCategory, sortBy, allPosts, post, categories, apiBlogs]);
+
+  // Helper for images
+  const getPostImages = (p: typeof post): string[] => {
+    if (!p) return ["/placeholder.svg"];
+    if (p.images && p.images.length > 0) return p.images;
+    return [p.image];
+  };
 
   useEffect(() => {
     if (post) {
@@ -48,6 +84,21 @@ const BlogPage = () => {
       );
     }
   }, [post]);
+
+  if (blogLoading) {
+    return (
+      <Layout title="Loading... - Clarity Blog">
+        <div className="container py-20 space-y-6">
+          <Skeleton className="w-full h-[40vh] rounded-xl" />
+          <div className="max-w-3xl mx-auto space-y-4">
+            <Skeleton className="h-8 w-32" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-6 w-2/3" />
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!post) {
     return (
@@ -74,7 +125,7 @@ const BlogPage = () => {
       <article className="container blog-content">
         {/* Article Header */}
         <header className="-mt-24 relative z-10 max-w-3xl mx-auto bg-card rounded-2xl shadow-lg p-8 md:p-12">
-          <Link to={`/category/${post.category.toLowerCase()}`}>
+          <Link to={`/category/${post.category.toLowerCase().replace(/\s+/g, "-")}`}>
             <Badge className="mb-4">{post.category}</Badge>
           </Link>
           <h1 className="font-heading text-3xl md:text-4xl font-bold mb-6 leading-tight">
@@ -105,7 +156,6 @@ const BlogPage = () => {
 
         {/* Article Content */}
         <div className="grid lg:grid-cols-12 gap-12 py-12">
-          {/* Sidebar */}
           <aside className="hidden lg:block lg:col-span-1">
             <div className="sticky top-24 space-y-4">
               <Button variant="ghost" size="icon" className="rounded-full">
@@ -128,7 +178,6 @@ const BlogPage = () => {
             </div>
           </aside>
 
-          {/* Main Content */}
           <div className="lg:col-span-7">
             <div
               className="prose prose-lg max-w-none"
@@ -136,10 +185,8 @@ const BlogPage = () => {
             />
           </div>
 
-          {/* Right Sidebar */}
           <aside className="lg:col-span-4">
             <div className="sticky top-24 space-y-8">
-              {/* Author Card */}
               <div className="bg-card rounded-xl p-6 shadow-card">
                 <h3 className="font-heading font-semibold mb-4">About the Author</h3>
                 <div className="flex items-center gap-4">
@@ -153,27 +200,24 @@ const BlogPage = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Ad Space */}
               <AdSpace variant="square" />
             </div>
           </aside>
         </div>
       </article>
 
-      {/* Related Posts with Filters */}
+      {/* Related Posts */}
       <section className="bg-secondary/30 py-16">
         <div className="container">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <h2 className="font-heading text-2xl font-bold">Related Articles</h2>
-            <div className="flex items-center gap-4">
-              <SortFilter value={sortBy} onChange={setSortBy} />
-            </div>
+            <SortFilter value={sortBy} onChange={setSortBy} />
           </div>
           <div className="mb-8">
             <CategoryFilter
               activeCategory={activeCategory}
               onCategoryChange={setActiveCategory}
+              categories={categories}
             />
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
