@@ -12,7 +12,7 @@ const AdSpace = ({
   const dimensions = {
     horizontal: "h-24 md:h-28",
     vertical: "h-96",
-    square: "aspect-square",
+    square: "aspect-square"
   };
 
   return (
