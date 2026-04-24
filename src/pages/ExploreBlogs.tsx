@@ -58,14 +58,29 @@ const ExploreBlogs = () => {
     return staticCategories;
   }, [apiCategories, posts]);
 
+  const activeCategoryObj = useMemo(
+    () => categories.find((c) => c.slug === activeCategory),
+    [categories, activeCategory]
+  );
+  const activeCategoryId = activeCategoryObj ? Number(activeCategoryObj.id) : null;
+
   const filteredPosts = useMemo(() => {
-    if (activeCategory === "all") return posts;
-    const cat = categories.find(c => c.slug === activeCategory);
-    if (!cat) return posts;
-    return posts.filter(
-      p => p.category.toLowerCase() === cat.name.toLowerCase()
-    );
-  }, [activeCategory, posts, categories]);
+    let result = posts;
+    if (activeCategory !== "all") {
+      const cat = categories.find(c => c.slug === activeCategory);
+      if (cat) {
+        result = result.filter(
+          p => p.category.toLowerCase() === cat.name.toLowerCase()
+        );
+      }
+    }
+    if (activeSubcategory !== "all") {
+      result = result.filter(
+        p => p.subcategory && p.subcategory.toLowerCase().replace(/\s+/g, "-") === activeSubcategory
+      );
+    }
+    return result;
+  }, [activeCategory, activeSubcategory, posts, categories]);
 
   const sortedPosts = useMemo(() => {
     if (apiBlogs && apiBlogs.length > 0) {
