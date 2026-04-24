@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
+import SubcategoryFilter from "@/components/blog/SubcategoryFilter";
 import SortFilter from "@/components/blog/SortFilter";
 import AdSpace from "@/components/blog/AdSpace";
 import { useAllBlogs, useAllCategories } from "@/hooks/useApi";
@@ -28,6 +29,7 @@ const cardVariants = {
 
 const ExploreBlogs = () => {
   const [activeCategory, setActiveCategory] = useState("all");
+  const [activeSubcategory, setActiveSubcategory] = useState("all");
   const [sortBy, setSortBy] = useState<SortOption>("latest");
   const { t } = useLanguage();
   const advertiseState = false;
@@ -56,14 +58,29 @@ const ExploreBlogs = () => {
     return staticCategories;
   }, [apiCategories, posts]);
 
+  const activeCategoryObj = useMemo(
+    () => categories.find((c) => c.slug === activeCategory),
+    [categories, activeCategory]
+  );
+  const activeCategoryId = activeCategoryObj ? Number(activeCategoryObj.id) : null;
+
   const filteredPosts = useMemo(() => {
-    if (activeCategory === "all") return posts;
-    const cat = categories.find(c => c.slug === activeCategory);
-    if (!cat) return posts;
-    return posts.filter(
-      p => p.category.toLowerCase() === cat.name.toLowerCase()
-    );
-  }, [activeCategory, posts, categories]);
+    let result = posts;
+    if (activeCategory !== "all") {
+      const cat = categories.find(c => c.slug === activeCategory);
+      if (cat) {
+        result = result.filter(
+          p => p.category.toLowerCase() === cat.name.toLowerCase()
+        );
+      }
+    }
+    if (activeSubcategory !== "all") {
+      result = result.filter(
+        p => p.subcategory && p.subcategory.toLowerCase().replace(/\s+/g, "-") === activeSubcategory
+      );
+    }
+    return result;
+  }, [activeCategory, activeSubcategory, posts, categories]);
 
   const sortedPosts = useMemo(() => {
     if (apiBlogs && apiBlogs.length > 0) {
@@ -95,17 +112,27 @@ const ExploreBlogs = () => {
       </section>
 
       <section className="sticky top-20 z-40 bg-background/95 backdrop-blur-md border-b border-border py-4">
-        <div className="container">
+        <div className="container space-y-3">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <CategoryFilter
               activeCategory={activeCategory}
-              onCategoryChange={setActiveCategory}
+              onCategoryChange={(c) => {
+                setActiveCategory(c);
+                setActiveSubcategory("all");
+              }}
               categories={categories}
             />
             <div className="flex justify-center lg:justify-end">
               <SortFilter value={sortBy} onChange={setSortBy} />
             </div>
           </div>
+          {activeCategoryId && (
+            <SubcategoryFilter
+              categoryId={activeCategoryId}
+              activeSubcategory={activeSubcategory}
+              onSubcategoryChange={setActiveSubcategory}
+            />
+          )}
         </div>
       </section>
 

@@ -21,6 +21,7 @@ export interface BlogPost {
   image: string;
   images?: string[]; // Multiple images for carousel
   category: string;
+  subcategory?: string;
   author: Author;
   publishedAt: string;
   readTime: number;
