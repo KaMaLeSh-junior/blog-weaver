@@ -65,5 +65,15 @@ export const fetchCategoryById = (id: number): Promise<ApiCategoryDetail> =>
 
 export const fetchSubcategories = (categoryId: number): Promise<ApiSubcategory[]> =>
   apiFetch<ApiSubcategory[]>(
-    `${API_BASE_URL}/user/subcategory/all?cat_id=${categoryId}`
+    `${API_BASE_URL}/public/subcategory/all?cat_id=${categoryId}`
   );
+
+export const fetchSubcategoryById = (id: number): Promise<ApiSubcategoryDetail> => {
+  // This endpoint returns the raw object directly (not wrapped in ApiResponse)
+  return fetch(`${API_BASE_URL}/public/subcategory/${id}`, {
+    headers: { "Content-Type": "application/json" },
+  }).then(async (res) => {
+    if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`);
+    return res.json();
+  });
+};
