@@ -29,6 +29,7 @@ const cardVariants = {
 
 const ExploreBlogs = () => {
   const [activeCategory, setActiveCategory] = useState("all");
+  const [activeSubcategory, setActiveSubcategory] = useState("all");
   const [sortBy, setSortBy] = useState<SortOption>("latest");
   const { t } = useLanguage();
   const advertiseState = false;
