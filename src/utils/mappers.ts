@@ -26,6 +26,7 @@ export const mapApiBlogToPost = (api: ApiBlogPost): BlogPost => ({
     ? api.images.map((img) => getImageUrl(img.image_name))
     : undefined,
   category: api.category?.name || "Uncategorized",
+  subcategory: api.subcategory?.name,
   author: defaultAuthor,
   publishedAt: api.created_date,
   readTime: Math.max(1, Math.ceil(api.large_description.replace(/<[^>]+>/g, "").split(/\s+/).length / 200)),

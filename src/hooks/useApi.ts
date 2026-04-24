@@ -6,6 +6,7 @@ import {
   fetchAllCategories,
   fetchCategoryById,
   fetchSubcategories,
+  fetchSubcategoryById,
 } from "@/services/blogService";
 
 // ============================================
@@ -62,4 +63,11 @@ export const useSubcategories = (categoryId: number) =>
     queryKey: ["subcategories", categoryId],
     queryFn: () => fetchSubcategories(categoryId),
     enabled: !!categoryId,
+  });
+
+export const useSubcategoryById = (id: number) =>
+  useQuery({
+    queryKey: ["subcategory", id],
+    queryFn: () => fetchSubcategoryById(id),
+    enabled: !!id,
   });
