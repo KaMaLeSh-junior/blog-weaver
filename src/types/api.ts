@@ -103,3 +103,13 @@ export interface ApiSubcategory {
     name: string;
   };
 }
+
+export interface ApiSubcategoryDetail {
+  id: number;
+  category_id: number;
+  name: string;
+  status: number;
+  category: {
+    name: string;
+  };
+}
