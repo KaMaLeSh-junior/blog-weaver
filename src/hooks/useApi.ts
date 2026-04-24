@@ -6,6 +6,7 @@ import {
   fetchAllCategories,
   fetchCategoryById,
   fetchSubcategories,
+  fetchSubcategoryById,
 } from "@/services/blogService";
 
 // ============================================
