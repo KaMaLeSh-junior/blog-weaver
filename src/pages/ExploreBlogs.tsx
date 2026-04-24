@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
-import SubcategoryFilter from "@/components/blog/SubcategoryFilter";
+
 import SortFilter from "@/components/blog/SortFilter";
 import AdSpace from "@/components/blog/AdSpace";
 import { useAllBlogs, useAllCategories } from "@/hooks/useApi";
@@ -29,7 +29,7 @@ const cardVariants = {
 
 const ExploreBlogs = () => {
   const [activeCategory, setActiveCategory] = useState("all");
-  const [activeSubcategory, setActiveSubcategory] = useState("all");
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("latest");
   const { t } = useLanguage();
   const advertiseState = false;
@@ -58,11 +58,16 @@ const ExploreBlogs = () => {
     return staticCategories;
   }, [apiCategories, posts]);
 
-  const activeCategoryObj = useMemo(
-    () => categories.find((c) => c.slug === activeCategory),
-    [categories, activeCategory]
-  );
-  const activeCategoryId = activeCategoryObj ? Number(activeCategoryObj.id) : null;
+  const handleCategoryChange = (slug: string) => {
+    setActiveCategory(slug);
+    setSelectedSubcategories([]);
+  };
+
+  const handleSubcategoryToggle = (slug: string) => {
+    setSelectedSubcategories((prev) =>
+      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
+    );
+  };
 
   const filteredPosts = useMemo(() => {
     let result = posts;
@@ -74,13 +79,17 @@ const ExploreBlogs = () => {
         );
       }
     }
-    if (activeSubcategory !== "all") {
+    if (selectedSubcategories.length > 0) {
       result = result.filter(
-        p => p.subcategory && p.subcategory.toLowerCase().replace(/\s+/g, "-") === activeSubcategory
+        p =>
+          p.subcategory &&
+          selectedSubcategories.includes(
+            p.subcategory.toLowerCase().replace(/\s+/g, "-")
+          )
       );
     }
     return result;
-  }, [activeCategory, activeSubcategory, posts, categories]);
+  }, [activeCategory, selectedSubcategories, posts, categories]);
 
   const sortedPosts = useMemo(() => {
     if (apiBlogs && apiBlogs.length > 0) {
@@ -112,27 +121,20 @@ const ExploreBlogs = () => {
       </section>
 
       <section className="sticky top-20 z-40 bg-background/95 backdrop-blur-md border-b border-border py-4">
-        <div className="container space-y-3">
+        <div className="container">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <CategoryFilter
               activeCategory={activeCategory}
-              onCategoryChange={(c) => {
-                setActiveCategory(c);
-                setActiveSubcategory("all");
-              }}
+              onCategoryChange={handleCategoryChange}
               categories={categories}
+              selectedSubcategories={selectedSubcategories}
+              onSubcategoryToggle={handleSubcategoryToggle}
+              onClearSubcategories={() => setSelectedSubcategories([])}
             />
             <div className="flex justify-center lg:justify-end">
               <SortFilter value={sortBy} onChange={setSortBy} />
             </div>
           </div>
-          {activeCategoryId && (
-            <SubcategoryFilter
-              categoryId={activeCategoryId}
-              activeSubcategory={activeSubcategory}
-              onSubcategoryChange={setActiveSubcategory}
-            />
-          )}
         </div>
       </section>
 
