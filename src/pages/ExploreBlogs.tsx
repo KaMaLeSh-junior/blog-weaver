@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
+import SubcategoryFilter from "@/components/blog/SubcategoryFilter";
 import SortFilter from "@/components/blog/SortFilter";
 import AdSpace from "@/components/blog/AdSpace";
 import { useAllBlogs, useAllCategories } from "@/hooks/useApi";
