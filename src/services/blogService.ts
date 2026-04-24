@@ -33,17 +33,17 @@ async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
 // ============================================
 
 export const fetchGeneralSettings = (): Promise<GeneralSettings[]> =>
-  apiFetch<GeneralSettings[]>(`${API_BASE_URL}/user/settings`);
+  apiFetch<GeneralSettings[]>(`${API_BASE_URL}/public/settings`);
 
 // ============================================
 // Blogs
 // ============================================
 
 export const fetchAllBlogs = (): Promise<ApiBlogPost[]> =>
-  apiFetch<ApiBlogPost[]>(`${API_BASE_URL}/user/blogs`);
+  apiFetch<ApiBlogPost[]>(`${API_BASE_URL}/public/blogs`);
 
 export const fetchBlogBySlug = (slug: string): Promise<ApiBlogPost> =>
-  apiFetch<ApiBlogPost>(`${API_BASE_URL}/user/blogs/getOneBlog`, {
+  apiFetch<ApiBlogPost>(`${API_BASE_URL}/public/blogs/getOneBlog`, {
     method: "POST",
     body: JSON.stringify({ slug }),
   });
@@ -53,10 +53,10 @@ export const fetchBlogBySlug = (slug: string): Promise<ApiBlogPost> =>
 // ============================================
 
 export const fetchAllCategories = (): Promise<ApiCategory[]> =>
-  apiFetch<ApiCategory[]>(`${API_BASE_URL}/user/category/all`);
+  apiFetch<ApiCategory[]>(`${API_BASE_URL}/public/category/all`);
 
 export const fetchCategoryById = (id: number): Promise<ApiCategoryDetail> =>
-  apiFetch<ApiCategoryDetail>(`${API_BASE_URL}/user/category/${id}`);
+  apiFetch<ApiCategoryDetail>(`${API_BASE_URL}/public/category/${id}`);
 
 // ============================================
 // Subcategories
@@ -64,5 +64,5 @@ export const fetchCategoryById = (id: number): Promise<ApiCategoryDetail> =>
 
 export const fetchSubcategories = (categoryId: number): Promise<ApiSubcategory[]> =>
   apiFetch<ApiSubcategory[]>(
-    `${API_BASE_URL}/user/subcategory/all?cat_id=${categoryId}`
+    `${API_BASE_URL}/public/subcategory/all?cat_id=${categoryId}`
   );
