@@ -6,6 +6,7 @@ import type {
   ApiCategory,
   ApiCategoryDetail,
   ApiSubcategory,
+  ApiSubcategoryDetail,
 } from "@/types/api";
 
 // Generic fetch helper
