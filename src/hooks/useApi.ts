@@ -64,3 +64,10 @@ export const useSubcategories = (categoryId: number) =>
     queryFn: () => fetchSubcategories(categoryId),
     enabled: !!categoryId,
   });
+
+export const useSubcategoryById = (id: number) =>
+  useQuery({
+    queryKey: ["subcategory", id],
+    queryFn: () => fetchSubcategoryById(id),
+    enabled: !!id,
+  });
