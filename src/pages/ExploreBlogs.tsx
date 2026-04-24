@@ -121,27 +121,20 @@ const ExploreBlogs = () => {
       </section>
 
       <section className="sticky top-20 z-40 bg-background/95 backdrop-blur-md border-b border-border py-4">
-        <div className="container space-y-3">
+        <div className="container">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <CategoryFilter
               activeCategory={activeCategory}
-              onCategoryChange={(c) => {
-                setActiveCategory(c);
-                setActiveSubcategory("all");
-              }}
+              onCategoryChange={handleCategoryChange}
               categories={categories}
+              selectedSubcategories={selectedSubcategories}
+              onSubcategoryToggle={handleSubcategoryToggle}
+              onClearSubcategories={() => setSelectedSubcategories([])}
             />
             <div className="flex justify-center lg:justify-end">
               <SortFilter value={sortBy} onChange={setSortBy} />
             </div>
           </div>
-          {activeCategoryId && (
-            <SubcategoryFilter
-              categoryId={activeCategoryId}
-              activeSubcategory={activeSubcategory}
-              onSubcategoryChange={setActiveSubcategory}
-            />
-          )}
         </div>
       </section>
 
