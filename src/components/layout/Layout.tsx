@@ -10,7 +10,7 @@ interface LayoutProps {
   description?: string;
 }
 
-const Layout = ({ children, title = "Clarity Blog", description = "Your source for insightful articles on technology, lifestyle, travel, and more." }: LayoutProps) => {
+const Layout = ({ children, title = "ClarityMFG", description = "Clarity Manufacturing — Insights on industrial automation, mechatronics, robotics and connected mobility." }: LayoutProps) => {
   return (
     <>
       <Helmet>

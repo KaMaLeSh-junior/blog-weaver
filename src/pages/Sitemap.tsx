@@ -6,8 +6,8 @@ import { ChevronRight } from "lucide-react";
 const Sitemap = () => {
   return (
     <Layout
-      title="Sitemap - Clarity Blog"
-      description="Complete sitemap of Clarity Blog. Navigate all our pages and content."
+      title="Sitemap - ClarityMFG"
+      description="Complete sitemap of ClarityMFG. Navigate all our pages and content."
     >
       <section className="py-16">
         <div className="container max-w-4xl">

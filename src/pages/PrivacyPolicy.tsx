@@ -13,8 +13,8 @@ const PrivacyPolicy = () => {
 
   return (
     <Layout
-      title="Privacy Policy - Clarity Blog"
-      description="Learn how Clarity Blog collects, uses, and protects your personal information."
+      title="Privacy Policy - ClarityMFG"
+      description="Learn how ClarityMFG collects, uses, and protects your personal information."
     >
       <section className="py-16 privacy-content">
         <div className="container max-w-3xl">
@@ -69,7 +69,7 @@ const PrivacyPolicy = () => {
               <h2 className="font-heading text-2xl font-bold mb-4">6. Contact Us</h2>
               <p className="text-muted-foreground leading-relaxed">
                 If you have any questions about this Privacy Policy, please contact us at 
-                privacy@clarity.blog or through our contact page.
+                privacy@clarityMFG.com or through our contact page.
               </p>
             </section>
           </div>

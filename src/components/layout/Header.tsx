@@ -72,7 +72,7 @@ const Header = () => {
               <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center transition-transform group-hover:scale-110">
                 <span className="text-primary-foreground font-heading font-bold text-lg">C</span>
               </div>
-              <span className="font-heading font-bold text-xl text-foreground">Clarity</span>
+              <span className="font-heading font-bold text-xl text-foreground">ClarityMFG</span>
             </Link>
 
             {/* Desktop Navigation */}

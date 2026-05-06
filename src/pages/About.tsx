@@ -24,16 +24,16 @@ const About = () => {
 
   return (
     <Layout
-      title="About Us - Clarity Blog"
-      description="Learn about Clarity Blog's mission to deliver insightful content on technology, lifestyle, and more."
+      title="About Us - ClarityMFG"
+      description="Learn about ClarityMFG's mission to deliver insightful content on industrial automation, mechatronics, robotics, and connected mobility."
     >
       {/* Hero */}
       <section className="gradient-hero py-20 about-section">
         <div className="container text-center">
-          <h1 className="font-heading text-4xl md:text-5xl font-bold mb-6">About Clarity</h1>
+          <h1 className="font-heading text-4xl md:text-5xl font-bold mb-6">About ClarityMFG</h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            We're a team of passionate writers and creators dedicated to bringing you 
-            the most insightful content across technology, lifestyle, travel, and culture.
+            We're a team of passionate engineers and writers dedicated to bringing you 
+            the most insightful content across industrial automation, mechatronics, robotics, and connected mobility.
           </p>
         </div>
       </section>
@@ -65,9 +65,9 @@ const About = () => {
             <div>
               <h2 className="font-heading text-3xl font-bold mb-6">Our Mission</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                At Clarity Blog, we believe in the power of well-crafted content to inform, 
+                At ClarityMFG, we believe in the power of well-crafted content to inform, 
                 inspire, and transform. Our mission is to create a platform where readers 
-                can discover thoughtful perspectives on the topics that matter most.
+                can discover thoughtful perspectives on industrial automation, robotics, mechatronics, and the future of manufacturing.
               </p>
               <p className="text-muted-foreground leading-relaxed">
                 We strive to maintain the highest standards of journalism while making 
