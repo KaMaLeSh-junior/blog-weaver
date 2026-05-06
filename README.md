@@ -1,4 +1,4 @@
-# Clarity — A Modern Blog Platform for the Industrial Automation Era
+# ClarityMFG — A Modern Publishing Platform for the Industrial Automation Era
 
 > A fast, multilingual, theme-aware publishing front-end built with React, TypeScript and Tailwind — designed as the public face for engineers, makers and integrators working on the future of industrial automation, mechatronics, robotics and connected mobility.
 
@@ -10,7 +10,7 @@ Industrial automation is moving out of the factory.
 
 What used to live behind locked PLC cabinets — robotic arms, vision systems, autonomous vehicles, mechatronic actuators, sensor fusion — is now reshaping logistics, agriculture, healthcare, energy and everyday consumer products. The people building this future are scattered across disciplines: mechanical engineers, embedded developers, ML researchers, control-systems specialists, OEM integrators.
 
-**Clarity is a publishing platform built for that audience.** A place to:
+**ClarityMFG is a publishing platform built for that audience.** A place to:
 
 - Document real-world automation projects (robots, EV systems, smart factories, IoT fleets)
 - Share field notes from mechatronics and control-systems work
@@ -62,7 +62,7 @@ The goal is not "another blog." It's a clean, modern reading experience that giv
 - Image URLs are resolved through a configurable `IMAGE_BASE_URL` so the storage host can change without touching code
 
 ### Auth scaffolding
-- Sign-in / Sign-up pages and Redux auth slice in place, ready to wire to a provider (Lovable Cloud / Supabase / custom JWT)
+- Sign-in / Sign-up pages and Redux auth slice in place, ready to wire to a provider (Lovable Cloud / custom JWT)
 
 ---
 
@@ -172,7 +172,7 @@ A few directions the platform is built to grow into:
 - **AI-assisted summaries & translations** so a Spanish field engineer can read an English white paper instantly
 - **Search across all content** with semantic matching
 
-The bigger bet: as industrial automation, robotics and electrified mobility become the backbone of every industry, the people building them need a publishing surface as polished as anything in consumer tech. Clarity is that surface.
+The bigger bet: as industrial automation, robotics and electrified mobility become the backbone of every industry, the people building them need a publishing surface as polished as anything in consumer tech. ClarityMFG is that surface.
 
 ---
 
