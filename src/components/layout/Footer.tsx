@@ -48,10 +48,10 @@ const Footer = () => {
               <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-heading font-bold text-lg">C</span>
               </div>
-              <span className="font-heading font-bold text-xl">Clarity</span>
+              <span className="font-heading font-bold text-xl">ClarityMFG</span>
             </Link>
             <p className="text-primary-foreground/70 mb-6 text-sm leading-relaxed">
-              Your go-to source for insightful articles, expert opinions, and the latest trends across technology, lifestyle, travel, and more.
+              Your go-to source for insightful articles on industrial automation, mechatronics, robotics, and connected mobility.
             </p>
             <div className="flex gap-3">
               {socialLinks.map((social) => (
@@ -115,10 +115,8 @@ const Footer = () => {
           <div>
             <h4 className="font-heading font-semibold text-lg mb-6">Contact Us</h4>
             <ul className="space-y-3 text-sm text-primary-foreground/70">
-              <li>123 Blog Street</li>
-              <li>San Francisco, CA 94102</li>
-              <li>contact@clarity.blog</li>
-              <li>+1 (555) 123-4567</li>
+              <li>Coimbatore, Tamil Nadu, India</li>
+              <li>contact@clarityMFG.com</li>
             </ul>
           </div>
         </div>
@@ -128,7 +126,7 @@ const Footer = () => {
       <div className="border-t border-primary-foreground/10">
         <div className="container py-6">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-primary-foreground/60">
-            <p>&copy; {new Date().getFullYear()} Clarity Blog. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} ClarityMFG. All rights reserved.</p>
             <div className="flex gap-6">
               <Link to="/privacy-policy" className="hover:text-primary transition-colors">
                 Privacy

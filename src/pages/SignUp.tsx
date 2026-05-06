@@ -34,7 +34,7 @@ const SignUp = () => {
       setIsLoading(false);
       toast({
         title: "Account Created!",
-        description: "Welcome to Clarity Blog. You can now sign in.",
+        description: "Welcome to ClarityMFG. You can now sign in.",
       });
       navigate("/signin");
     }, 1500);
@@ -42,8 +42,8 @@ const SignUp = () => {
 
   return (
     <Layout
-      title="Sign Up - Clarity Blog"
-      description="Create your Clarity Blog account and join our community of readers."
+      title="Sign Up - ClarityMFG"
+      description="Create your ClarityMFG account and join our community of readers."
     >
       <section className="min-h-[calc(100vh-5rem)] flex items-center justify-center py-12">
         <div className="container max-w-md">
