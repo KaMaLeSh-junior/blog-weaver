@@ -87,7 +87,7 @@ const BlogPage = () => {
 
   if (blogLoading) {
     return (
-      <Layout title="Loading... - Clarity Blog">
+      <Layout title="Loading... - ClarityMFG">
         <div className="container py-20 space-y-6">
           <Skeleton className="w-full h-[40vh] rounded-xl" />
           <div className="max-w-3xl mx-auto space-y-4">
@@ -102,7 +102,7 @@ const BlogPage = () => {
 
   if (!post) {
     return (
-      <Layout title="Post Not Found - Clarity Blog">
+      <Layout title="Post Not Found - ClarityMFG">
         <div className="container py-20 text-center">
           <h1 className="font-heading text-3xl font-bold mb-4">Post Not Found</h1>
           <p className="text-muted-foreground">The article you're looking for doesn't exist.</p>
@@ -113,7 +113,7 @@ const BlogPage = () => {
 
   return (
     <Layout
-      title={`${post.title} - Clarity Blog`}
+      title={`${post.title} - ClarityMFG`}
       description={post.excerpt}
     >
       {/* Hero Image Carousel */}

@@ -84,7 +84,7 @@ const CategoryPage = () => {
 
   if (!blogsLoading && !category) {
     return (
-      <Layout title="Category Not Found - Clarity Blog">
+      <Layout title="Category Not Found - ClarityMFG">
         <div className="container py-20 text-center">
           <h1 className="font-heading text-3xl font-bold mb-4">Category Not Found</h1>
           <p className="text-muted-foreground">The category you're looking for doesn't exist.</p>
@@ -95,7 +95,7 @@ const CategoryPage = () => {
 
   return (
     <Layout
-      title={`${category?.name || "Category"} - Clarity Blog`}
+      title={`${category?.name || "Category"} - ClarityMFG`}
       description={category?.description}
     >
       <section className="gradient-hero py-16 category-header">
