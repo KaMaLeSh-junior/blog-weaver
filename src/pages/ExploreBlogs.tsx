@@ -280,7 +280,9 @@ const ExploreBlogs = () => {
           {!blogsLoading && displayedItems.length === 0 && (
             <div className="text-center py-16">
               <p className="text-muted-foreground text-lg">
-                No articles found for this category.
+                {searchQuery.trim()
+                  ? `No articles found for "${searchQuery}".`
+                  : "No articles found for this category."}
               </p>
             </div>
           )}
