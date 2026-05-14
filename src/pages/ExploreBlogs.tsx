@@ -140,14 +140,58 @@ const ExploreBlogs = () => {
       <section className="sticky top-20 z-40 bg-background/95 backdrop-blur-md border-b border-border py-4">
         <div className="container">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <CategoryFilter
-              activeCategory={activeCategory}
-              onCategoryChange={handleCategoryChange}
-              categories={categories}
-              selectedSubcategories={selectedSubcategories}
-              onSubcategoryToggle={handleSubcategoryToggle}
-              onClearSubcategories={() => setSelectedSubcategories([])}
-            />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-1">
+              <CategoryFilter
+                activeCategory={activeCategory}
+                onCategoryChange={handleCategoryChange}
+                categories={categories}
+                selectedSubcategories={selectedSubcategories}
+                onSubcategoryToggle={handleSubcategoryToggle}
+                onClearSubcategories={() => setSelectedSubcategories([])}
+              />
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchQuery.trim()) {
+                    setSearchParams({ search: searchQuery.trim() });
+                  } else {
+                    setSearchParams({});
+                  }
+                }}
+                className="w-full sm:w-auto"
+              >
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Search articles..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      if (!e.target.value.trim()) {
+                        setSearchParams({});
+                      }
+                    }}
+                    className="pl-9 pr-9 h-9 w-full sm:w-56 lg:w-72"
+                  />
+                  {searchQuery && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setSearchParams({});
+                      }}
+                    >
+                      <span className="sr-only">Clear search</span>
+                      <span className="text-muted-foreground text-xs">✕</span>
+                    </Button>
+                  )}
+                </div>
+              </form>
+            </div>
             <div className="flex justify-center lg:justify-end">
               <SortFilter value={sortBy} onChange={setSortBy} />
             </div>
