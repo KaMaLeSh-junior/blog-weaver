@@ -93,8 +93,20 @@ const ExploreBlogs = () => {
           )
       );
     }
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        p =>
+          p.title.toLowerCase().includes(query) ||
+          p.excerpt.toLowerCase().includes(query) ||
+          p.content.toLowerCase().includes(query) ||
+          p.category.toLowerCase().includes(query) ||
+          (p.subcategory && p.subcategory.toLowerCase().includes(query)) ||
+          p.author.name.toLowerCase().includes(query)
+      );
+    }
     return result;
-  }, [activeCategory, selectedSubcategories, posts, categories]);
+  }, [activeCategory, selectedSubcategories, posts, categories, searchQuery]);
 
   const sortedPosts = useMemo(() => {
     if (apiBlogs && apiBlogs.length > 0) {
