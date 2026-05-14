@@ -8,7 +8,7 @@ import SortFilter from "@/components/blog/SortFilter";
 import AdSpace from "@/components/blog/AdSpace";
 import { useAllBlogs, useAllCategories } from "@/hooks/useApi";
 import { mapApiBlogToPost, mapApiCategoryToCategory, getSortedApiPosts, SortOption } from "@/utils/mappers";
-import { blogPosts as staticPosts, categories as staticCategories } from "@/data/blogData";
+import { blogPosts as staticPosts, categories as staticCategories, getSortedPosts } from "@/data/blogData";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { Loader2 } from "lucide-react";
