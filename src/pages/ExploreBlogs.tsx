@@ -228,7 +228,7 @@ const ExploreBlogs = () => {
               <div className="lg:col-span-3">
                 <AnimatePresence mode="wait">
                   <motion.div
-                    key={`${activeCategory}-${sortBy}`}
+                    key={`${activeCategory}-${sortBy}-${searchQuery}`}
                     className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
                     initial="hidden"
                     animate="visible"
