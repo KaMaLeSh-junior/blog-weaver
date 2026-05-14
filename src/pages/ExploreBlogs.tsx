@@ -31,9 +31,11 @@ const cardVariants = {
 };
 
 const ExploreBlogs = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("all");
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("latest");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const { t } = useLanguage();
   const advertiseState = false;
 
