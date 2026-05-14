@@ -31,8 +31,8 @@ const SignIn = () => {
 
   return (
     <Layout
-      title="Sign In - Clarity Blog"
-      description="Sign in to your Clarity Blog account to access personalized content."
+      title="Sign In - ClarityMFG"
+      description="Sign in to your ClarityMFG account to access personalized content."
     >
       <section className="min-h-[calc(100vh-5rem)] flex items-center justify-center py-12">
         <div className="container max-w-md">

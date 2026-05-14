@@ -44,15 +44,14 @@ const Contact = () => {
   };
 
   const contactInfo = [
-    { icon: Mail, label: "Email", value: "contact@clarity.blog" },
-    { icon: Phone, label: "Phone", value: "+1 (555) 123-4567" },
-    { icon: MapPin, label: "Address", value: "123 Blog Street, San Francisco, CA 94102" },
+    { icon: Mail, label: "Email", value: "contact@clarityMFG.com" },
+    { icon: MapPin, label: "Address", value: "Coimbatore, Tamil Nadu, India" },
   ];
 
   return (
     <Layout
-      title="Contact Us - Clarity Blog"
-      description="Get in touch with the Clarity Blog team. We'd love to hear from you."
+      title="Contact Us - ClarityMFG"
+      description="Get in touch with the ClarityMFG team. We'd love to hear from you."
     >
       {/* Hero */}
       <section className="gradient-hero py-16 contact-section">

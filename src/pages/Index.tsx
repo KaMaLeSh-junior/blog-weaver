@@ -103,8 +103,8 @@ const Index = () => {
 
   return (
     <Layout
-      title="Clarity Blog - Insights on Technology, Lifestyle & More"
-      description="Discover insightful articles on technology, lifestyle, travel, health, and culture. Stay informed with Clarity Blog."
+      title="ClarityMFG - Clarity Manufacturing"
+      description="Discover insightful articles on industrial automation, mechatronics, robotics, and connected mobility. Stay informed with ClarityMFG."
     >
       {/* Hero Section */}
       <motion.section 

@@ -106,8 +106,8 @@ const ExploreBlogs = () => {
 
   return (
     <Layout
-      title="Explore Blogs - Clarity Blog"
-      description="Browse all articles on technology, lifestyle, travel, health, and culture."
+      title="Explore Blogs - ClarityMFG"
+      description="Browse all articles on industrial automation, mechatronics, robotics, and connected mobility."
     >
       <section className="gradient-hero py-12 md:py-16">
         <div className="container text-center">
