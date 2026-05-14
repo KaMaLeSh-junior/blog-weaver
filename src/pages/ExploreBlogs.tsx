@@ -1,18 +1,21 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { Search } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
-
 import SortFilter from "@/components/blog/SortFilter";
 import AdSpace from "@/components/blog/AdSpace";
 import { useAllBlogs, useAllCategories } from "@/hooks/useApi";
 import { mapApiBlogToPost, mapApiCategoryToCategory, getSortedApiPosts, SortOption } from "@/utils/mappers";
-import { blogPosts as staticPosts, categories as staticCategories, getSortedPosts } from "@/data/blogData";
+import { blogPosts as staticPosts, categories as staticCategories } from "@/data/blogData";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
