@@ -97,9 +97,52 @@ const Header = () => {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="hidden sm:flex">
-                <Search className="h-5 w-5" />
-              </Button>
+              {isSearchOpen ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (searchInput.trim()) {
+                      navigate(`/explore?search=${encodeURIComponent(searchInput.trim())}`);
+                      setIsSearchOpen(false);
+                      setSearchInput("");
+                    }
+                  }}
+                  className="hidden sm:flex items-center gap-2"
+                >
+                  <Input
+                    ref={searchRef}
+                    type="text"
+                    placeholder={t.common.search}
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    className="w-48 lg:w-64 h-9"
+                    autoFocus
+                  />
+                  <Button type="submit" size="icon" variant="ghost">
+                    <Search className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => {
+                      setIsSearchOpen(false);
+                      setSearchInput("");
+                    }}
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </form>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hidden sm:flex"
+                  onClick={() => setIsSearchOpen(true)}
+                >
+                  <Search className="h-5 w-5" />
+                </Button>
+              )}
 
               <ThemeToggle />
               <LanguageSwitcher />
