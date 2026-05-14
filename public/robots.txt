@@ -1,8 +1,14 @@
 User-agent: Googlebot
 Allow: /
+Allow: /blog/
+Allow: /category/
+Allow: /explore
 
 User-agent: Bingbot
 Allow: /
+Allow: /blog/
+Allow: /category/
+Allow: /explore
 
 User-agent: Twitterbot
 Allow: /
@@ -12,3 +18,8 @@ Allow: /
 
 User-agent: *
 Allow: /
+Allow: /blog/
+Allow: /category/
+Allow: /explore
+
+Sitemap: /sitemap.xml
