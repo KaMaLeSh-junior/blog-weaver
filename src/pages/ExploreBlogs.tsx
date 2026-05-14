@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { Search } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
-
 import SortFilter from "@/components/blog/SortFilter";
 import AdSpace from "@/components/blog/AdSpace";
 import { useAllBlogs, useAllCategories } from "@/hooks/useApi";
@@ -13,6 +14,8 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -28,9 +31,11 @@ const cardVariants = {
 };
 
 const ExploreBlogs = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("all");
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("latest");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const { t } = useLanguage();
   const advertiseState = false;
 
@@ -88,8 +93,20 @@ const ExploreBlogs = () => {
           )
       );
     }
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        p =>
+          p.title.toLowerCase().includes(query) ||
+          p.excerpt.toLowerCase().includes(query) ||
+          p.content.toLowerCase().includes(query) ||
+          p.category.toLowerCase().includes(query) ||
+          (p.subcategory && p.subcategory.toLowerCase().includes(query)) ||
+          p.author.name.toLowerCase().includes(query)
+      );
+    }
     return result;
-  }, [activeCategory, selectedSubcategories, posts, categories]);
+  }, [activeCategory, selectedSubcategories, posts, categories, searchQuery]);
 
   const sortedPosts = useMemo(() => {
     if (apiBlogs && apiBlogs.length > 0) {
@@ -123,14 +140,58 @@ const ExploreBlogs = () => {
       <section className="sticky top-20 z-40 bg-background/95 backdrop-blur-md border-b border-border py-4">
         <div className="container">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <CategoryFilter
-              activeCategory={activeCategory}
-              onCategoryChange={handleCategoryChange}
-              categories={categories}
-              selectedSubcategories={selectedSubcategories}
-              onSubcategoryToggle={handleSubcategoryToggle}
-              onClearSubcategories={() => setSelectedSubcategories([])}
-            />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-1">
+              <CategoryFilter
+                activeCategory={activeCategory}
+                onCategoryChange={handleCategoryChange}
+                categories={categories}
+                selectedSubcategories={selectedSubcategories}
+                onSubcategoryToggle={handleSubcategoryToggle}
+                onClearSubcategories={() => setSelectedSubcategories([])}
+              />
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchQuery.trim()) {
+                    setSearchParams({ search: searchQuery.trim() });
+                  } else {
+                    setSearchParams({});
+                  }
+                }}
+                className="w-full sm:w-auto"
+              >
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Search articles..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      if (!e.target.value.trim()) {
+                        setSearchParams({});
+                      }
+                    }}
+                    className="pl-9 pr-9 h-9 w-full sm:w-56 lg:w-72"
+                  />
+                  {searchQuery && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setSearchParams({});
+                      }}
+                    >
+                      <span className="sr-only">Clear search</span>
+                      <span className="text-muted-foreground text-xs">✕</span>
+                    </Button>
+                  )}
+                </div>
+              </form>
+            </div>
             <div className="flex justify-center lg:justify-end">
               <SortFilter value={sortBy} onChange={setSortBy} />
             </div>
@@ -167,7 +228,7 @@ const ExploreBlogs = () => {
               <div className="lg:col-span-3">
                 <AnimatePresence mode="wait">
                   <motion.div
-                    key={`${activeCategory}-${sortBy}`}
+                    key={`${activeCategory}-${sortBy}-${searchQuery}`}
                     className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
                     initial="hidden"
                     animate="visible"
@@ -219,7 +280,9 @@ const ExploreBlogs = () => {
           {!blogsLoading && displayedItems.length === 0 && (
             <div className="text-center py-16">
               <p className="text-muted-foreground text-lg">
-                No articles found for this category.
+                {searchQuery.trim()
+                  ? `No articles found for "${searchQuery}".`
+                  : "No articles found for this category."}
               </p>
             </div>
           )}
