@@ -114,8 +114,8 @@ const ExploreBlogs = () => {
 
   useEffect(() => {
     if (location.state?.focusSearch && exploreSearchRef.current) {
-      setSearchFocused(true);
       exploreSearchRef.current.focus();
+      exploreSearchRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
       // Clear the state so refresh doesn't re-trigger
       navigate(location.pathname + location.search, { replace: true, state: {} });
     }
