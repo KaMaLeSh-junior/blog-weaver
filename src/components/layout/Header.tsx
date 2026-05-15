@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Search, Home, BookOpen, User } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, Search, Home, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -17,7 +18,11 @@ import gsap from "gsap";
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -92,9 +97,35 @@ const Header = () => {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="hidden sm:flex">
-                <Search className="h-5 w-5" />
-              </Button>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchInput.trim()) {
+                    navigate(`/explore?search=${encodeURIComponent(searchInput.trim())}`);
+                    setSearchInput("");
+                  }
+                }}
+                className="hidden sm:flex items-center relative"
+              >
+                <Search className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  ref={searchRef}
+                  type="text"
+                  placeholder={t.common.search}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="w-48 lg:w-64 h-9 pl-9 pr-8"
+                />
+                {searchInput && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchInput("")}
+                    className="absolute right-2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </form>
 
               <ThemeToggle />
               <LanguageSwitcher />
@@ -128,15 +159,17 @@ const Header = () => {
           </Link>
 
           {/* Search */}
-          <Link
-            to="/explore"
+          <button
+            onClick={() => navigate("/explore", { state: { focusSearch: true } })}
             className={`flex flex-col items-center justify-center gap-1 flex-1 py-2 transition-colors ${
-              location.pathname.includes("search") ? "text-primary" : "text-muted-foreground hover:text-foreground"
+              location.pathname === "/explore" && location.search.includes("search")
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <Search className="h-5 w-5" />
             <span className="text-xs font-medium">{t.nav.search}</span>
-          </Link>
+          </button>
 
           {/* Blogs */}
           <Link
@@ -178,6 +211,33 @@ const Header = () => {
                     <span className="font-medium">{link.name}</span>
                   </Link>
                 ))}
+                
+                <div className="border-t border-border my-4" />
+                
+                <form
+                  className="sheet-menu-item px-4"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (searchInput.trim()) {
+                      navigate(`/explore?search=${encodeURIComponent(searchInput.trim())}`);
+                      setIsSheetOpen(false);
+                      setSearchInput("");
+                    }
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="text"
+                      placeholder={t.common.search}
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
+                      className="flex-1 h-9"
+                    />
+                    <Button type="submit" size="icon" variant="ghost">
+                      <Search className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </form>
                 
                 <div className="border-t border-border my-4" />
                 
