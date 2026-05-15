@@ -38,7 +38,6 @@ const ExploreBlogs = () => {
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("latest");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
-  const [searchFocused, setSearchFocused] = useState(false);
   const exploreSearchRef = useRef<HTMLInputElement>(null);
   const { t } = useLanguage();
   const advertiseState = false;
