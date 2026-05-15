@@ -176,6 +176,7 @@ const ExploreBlogs = () => {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
+                    ref={exploreSearchRef}
                     type="text"
                     placeholder={
                       selectedSubcategories.length > 0
@@ -191,7 +192,12 @@ const ExploreBlogs = () => {
                         setSearchParams({});
                       }
                     }}
-                    className="pl-9 pr-9 h-9 w-full sm:w-56 lg:w-72"
+                    onFocus={() => setSearchFocused(false)}
+                    className={`pl-9 pr-9 h-9 w-full sm:w-56 lg:w-72 transition-all duration-300 ${
+                      searchFocused
+                        ? "ring-2 ring-primary border-primary"
+                        : ""
+                    }`}
                   />
                   {searchQuery && (
                     <Button
