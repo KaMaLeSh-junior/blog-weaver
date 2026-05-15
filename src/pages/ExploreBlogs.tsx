@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
@@ -32,10 +32,14 @@ const cardVariants = {
 
 const ExploreBlogs = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("all");
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("latest");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+  const [searchFocused, setSearchFocused] = useState(false);
+  const exploreSearchRef = useRef<HTMLInputElement>(null);
   const { t } = useLanguage();
   const advertiseState = false;
 
