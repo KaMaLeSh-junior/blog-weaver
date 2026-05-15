@@ -97,52 +97,35 @@ const Header = () => {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-3">
-              {isSearchOpen ? (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (searchInput.trim()) {
-                      navigate(`/explore?search=${encodeURIComponent(searchInput.trim())}`);
-                      setIsSearchOpen(false);
-                      setSearchInput("");
-                    }
-                  }}
-                  className="hidden sm:flex items-center gap-2"
-                >
-                  <Input
-                    ref={searchRef}
-                    type="text"
-                    placeholder={t.common.search}
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    className="w-48 lg:w-64 h-9"
-                    autoFocus
-                  />
-                  <Button type="submit" size="icon" variant="ghost">
-                    <Search className="h-5 w-5" />
-                  </Button>
-                  <Button
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchInput.trim()) {
+                    navigate(`/explore?search=${encodeURIComponent(searchInput.trim())}`);
+                    setSearchInput("");
+                  }
+                }}
+                className="hidden sm:flex items-center relative"
+              >
+                <Search className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  ref={searchRef}
+                  type="text"
+                  placeholder={t.common.search}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="w-48 lg:w-64 h-9 pl-9 pr-8"
+                />
+                {searchInput && (
+                  <button
                     type="button"
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => {
-                      setIsSearchOpen(false);
-                      setSearchInput("");
-                    }}
+                    onClick={() => setSearchInput("")}
+                    className="absolute right-2 text-muted-foreground hover:text-foreground"
                   >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </form>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hidden sm:flex"
-                  onClick={() => setIsSearchOpen(true)}
-                >
-                  <Search className="h-5 w-5" />
-                </Button>
-              )}
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </form>
 
               <ThemeToggle />
               <LanguageSwitcher />
