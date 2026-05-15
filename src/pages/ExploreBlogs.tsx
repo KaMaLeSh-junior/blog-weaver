@@ -164,7 +164,13 @@ const ExploreBlogs = () => {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="text"
-                    placeholder="Search articles..."
+                    placeholder={
+                      selectedSubcategories.length > 0
+                        ? `Search in ${selectedSubcategories.length} subcategor${selectedSubcategories.length === 1 ? "y" : "ies"}...`
+                        : activeCategory !== "all"
+                        ? `Search in ${categories.find(c => c.slug === activeCategory)?.name || "category"}...`
+                        : "Search all articles..."
+                    }
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
