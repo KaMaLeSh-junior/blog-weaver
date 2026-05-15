@@ -191,12 +191,7 @@ const ExploreBlogs = () => {
                         setSearchParams({});
                       }
                     }}
-                    onFocus={() => setSearchFocused(false)}
-                    className={`pl-9 pr-9 h-9 w-full sm:w-56 lg:w-72 transition-all duration-300 ${
-                      searchFocused
-                        ? "ring-2 ring-primary border-primary"
-                        : ""
-                    }`}
+                    className="pl-9 pr-9 h-9 w-full sm:w-56 lg:w-72 focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                   {searchQuery && (
                     <Button
