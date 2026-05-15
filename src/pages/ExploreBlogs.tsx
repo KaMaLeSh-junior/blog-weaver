@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
@@ -32,10 +32,13 @@ const cardVariants = {
 
 const ExploreBlogs = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("all");
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("latest");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+  const exploreSearchRef = useRef<HTMLInputElement>(null);
   const { t } = useLanguage();
   const advertiseState = false;
 
@@ -108,6 +111,15 @@ const ExploreBlogs = () => {
     return result;
   }, [activeCategory, selectedSubcategories, posts, categories, searchQuery]);
 
+  useEffect(() => {
+    if (location.state?.focusSearch && exploreSearchRef.current) {
+      exploreSearchRef.current.focus();
+      exploreSearchRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      // Clear the state so refresh doesn't re-trigger
+      navigate(location.pathname + location.search, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
+
   const sortedPosts = useMemo(() => {
     if (apiBlogs && apiBlogs.length > 0) {
       return getSortedApiPosts(filteredPosts, sortBy);
@@ -163,6 +175,7 @@ const ExploreBlogs = () => {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
+                    ref={exploreSearchRef}
                     type="text"
                     placeholder={
                       selectedSubcategories.length > 0
@@ -178,7 +191,7 @@ const ExploreBlogs = () => {
                         setSearchParams({});
                       }
                     }}
-                    className="pl-9 pr-9 h-9 w-full sm:w-56 lg:w-72"
+                    className="pl-9 pr-9 h-9 w-full sm:w-56 lg:w-72 focus:ring-2 focus:ring-primary focus:border-primary"
                   />
                   {searchQuery && (
                     <Button

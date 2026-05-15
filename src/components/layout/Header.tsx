@@ -159,15 +159,17 @@ const Header = () => {
           </Link>
 
           {/* Search */}
-          <Link
-            to="/explore"
+          <button
+            onClick={() => navigate("/explore", { state: { focusSearch: true } })}
             className={`flex flex-col items-center justify-center gap-1 flex-1 py-2 transition-colors ${
-              location.pathname.includes("search") ? "text-primary" : "text-muted-foreground hover:text-foreground"
+              location.pathname === "/explore" && location.search.includes("search")
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <Search className="h-5 w-5" />
             <span className="text-xs font-medium">{t.nav.search}</span>
-          </Link>
+          </button>
 
           {/* Blogs */}
           <Link
