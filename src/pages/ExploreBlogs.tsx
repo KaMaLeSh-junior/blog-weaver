@@ -112,6 +112,15 @@ const ExploreBlogs = () => {
     return result;
   }, [activeCategory, selectedSubcategories, posts, categories, searchQuery]);
 
+  useEffect(() => {
+    if (location.state?.focusSearch && exploreSearchRef.current) {
+      setSearchFocused(true);
+      exploreSearchRef.current.focus();
+      // Clear the state so refresh doesn't re-trigger
+      navigate(location.pathname + location.search, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
+
   const sortedPosts = useMemo(() => {
     if (apiBlogs && apiBlogs.length > 0) {
       return getSortedApiPosts(filteredPosts, sortBy);
