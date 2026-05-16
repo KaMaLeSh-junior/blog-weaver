@@ -7,6 +7,9 @@ import {
   fetchCategoryById,
   fetchSubcategories,
   fetchSubcategoryById,
+  fetchBlogHighlights,
+  fetchBlogsByCategory,
+  fetchBlogsBySubcategory,
 } from "@/services/blogService";
 
 // ============================================
@@ -28,6 +31,29 @@ export const useAllBlogs = () =>
   useQuery({
     queryKey: ["blogs"],
     queryFn: fetchAllBlogs,
+  });
+
+export const useBlogHighlights = () =>
+  useQuery({
+    queryKey: ["blogHighlights"],
+    queryFn: fetchBlogHighlights,
+  });
+
+export const useBlogsByCategory = (category: string) =>
+  useQuery({
+    queryKey: ["blogsByCategory", category],
+    queryFn: () => fetchBlogsByCategory(category),
+    enabled: !!category,
+  });
+
+export const useBlogsBySubcategory = (
+  categorySlug: string,
+  subcategorySlug: string[],
+) =>
+  useQuery({
+    queryKey: ["blogsBySubcategory", categorySlug, subcategorySlug],
+    queryFn: () => fetchBlogsBySubcategory(categorySlug, subcategorySlug),
+    enabled: subcategorySlug.length > 0,
   });
 
 export const useBlogBySlug = (slug: string) =>

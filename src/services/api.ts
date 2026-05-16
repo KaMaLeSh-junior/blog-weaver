@@ -100,6 +100,11 @@ export const blogApi = {
   searchPosts: (query: string) => {
     return apiRequest(`/posts/search?q=${encodeURIComponent(query)}`);
   },
+
+  //Get highlighted posts
+  getHighlightedPosts: () => {
+    return apiRequest('/blogs/blogHighlights');
+  },
 };
 
 // ============================================

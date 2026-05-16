@@ -4,7 +4,7 @@ import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
 import AdSpace from "@/components/blog/AdSpace";
 import TrendingSidebar from "@/components/blog/TrendingSidebar";
-import { useAllBlogs, useAllCategories } from "@/hooks/useApi";
+import { useAllBlogs, useAllCategories, useBlogHighlights } from "@/hooks/useApi";
 import { mapApiBlogToPost, mapApiCategoryToCategory } from "@/utils/mappers";
 import { blogPosts as staticPosts, getFeaturedPosts, getTrendingPosts, getMostViewedPosts, categories as staticCategories } from "@/data/blogData";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
@@ -25,16 +25,17 @@ const Index = () => {
   const newsletterRef = useRef<HTMLDivElement>(null);
 
   // API data
-  const { data: apiBlogs, isLoading: blogsLoading } = useAllBlogs();
+  // const { data: apiBlogs, isLoading: blogsLoading } = useAllBlogs();
+  const { data: apiBlogHighlights, isLoading: blogsLoading } = useBlogHighlights();
   const { data: apiCategories } = useAllCategories();
 
   // Map API data to frontend types, fallback to static
   const posts = useMemo(() => {
-    if (apiBlogs && apiBlogs.length > 0) {
-      return apiBlogs.filter(b => b.status === 1).map(mapApiBlogToPost);
+    if (apiBlogHighlights && apiBlogHighlights.length > 0) {
+      return apiBlogHighlights.filter(b => b.status === 1).map(mapApiBlogToPost);
     }
     return staticPosts;
-  }, [apiBlogs]);
+  }, [apiBlogHighlights]);
 
   const categories = useMemo(() => {
     if (apiCategories && apiCategories.length > 0) {
@@ -52,12 +53,12 @@ const Index = () => {
 
   // Featured = first 4 posts (API has no featured flag)
   const featuredPosts = useMemo(() => {
-    if (apiBlogs && apiBlogs.length > 0) return posts.slice(0, 4);
+    if (useBlogHighlights && useBlogHighlights.length > 0) return posts.slice(0, 4);
     return getFeaturedPosts(4);
-  }, [apiBlogs, posts]);
+  }, [useBlogHighlights, posts]);
 
   const filteredPosts = useMemo(() => {
-    const nonFeatured = apiBlogs && apiBlogs.length > 0
+    const nonFeatured = apiBlogHighlights && apiBlogHighlights.length > 0
       ? posts.slice(4)
       : staticPosts.filter(p => !p.featured);
 
@@ -67,17 +68,17 @@ const Index = () => {
     return nonFeatured.filter(
       p => p.category.toLowerCase() === cat.name.toLowerCase()
     );
-  }, [activeCategory, posts, categories, apiBlogs]);
+  }, [activeCategory, posts, categories, apiBlogHighlights]);
 
-  const trendingPosts = useMemo(() => {
-    if (apiBlogs && apiBlogs.length > 0) return posts.slice(0, 4);
-    return getTrendingPosts(4);
-  }, [apiBlogs, posts]);
+  // const trendingPosts = useMemo(() => {
+  //   if (apiBlogs && apiBlogs.length > 0) return posts.slice(0, 4);
+  //   return getTrendingPosts(4);
+  // }, [apiBlogs, posts]);
 
-  const mostViewedPosts = useMemo(() => {
-    if (apiBlogs && apiBlogs.length > 0) return posts.slice(0, 4);
-    return getMostViewedPosts(4);
-  }, [apiBlogs, posts]);
+  // const mostViewedPosts = useMemo(() => {
+  //   if (apiBlogs && apiBlogs.length > 0) return posts.slice(0, 4);
+  //   return getMostViewedPosts(4);
+  // }, [apiBlogs, posts]);
 
   const { displayedItems, hasMore, isLoading, loaderRef } = useInfiniteScroll({
     items: filteredPosts,
@@ -187,7 +188,7 @@ const Index = () => {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <motion.div variants={itemVariants}>
+            {/* <motion.div variants={itemVariants}>
               <TrendingSidebar
                 trendingPosts={trendingPosts}
                 mostViewedPosts={[]}
@@ -200,7 +201,7 @@ const Index = () => {
                 mostViewedPosts={mostViewedPosts}
                 title="Most Viewed"
               />
-            </motion.div>
+            </motion.div> */}
           </motion.div>
         </div>
       </motion.section>

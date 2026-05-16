@@ -43,11 +43,34 @@ export const fetchGeneralSettings = (): Promise<GeneralSettings[]> =>
 export const fetchAllBlogs = (): Promise<ApiBlogPost[]> =>
   apiFetch<ApiBlogPost[]>(`${API_BASE_URL}/public/blogs`);
 
+export const fetchBlogHighlights = (): Promise<ApiBlogPost[]> =>
+  apiFetch<ApiBlogPost[]>(`${API_BASE_URL}/public/blogs/blogHighlights`);
+
 export const fetchBlogBySlug = (slug: string): Promise<ApiBlogPost> =>
   apiFetch<ApiBlogPost>(`${API_BASE_URL}/public/blogs/getOneBlog`, {
     method: "POST",
     body: JSON.stringify({ slug }),
   });
+
+export const fetchBlogsByCategory = (
+  category: string,
+): Promise<ApiBlogPost[]> =>
+  apiFetch<ApiBlogPost[]>(`${API_BASE_URL}/public/blogs/getBlogsByCategory`, {
+    method: "POST",
+    body: JSON.stringify({ category: category }),
+  });
+
+export const fetchBlogsBySubcategory = (
+  categorySlug: string,
+  subcategorySlug: string[],
+): Promise<ApiBlogPost[]> =>
+  apiFetch<ApiBlogPost[]>(
+    `${API_BASE_URL}/public/blogs/getBlogsBySubcategory`,
+    {
+      method: "POST",
+      body: JSON.stringify({ category: categorySlug, subcategory: subcategorySlug }),
+    },
+  );
 
 // ============================================
 // Categories
@@ -63,12 +86,16 @@ export const fetchCategoryById = (id: number): Promise<ApiCategoryDetail> =>
 // Subcategories
 // ============================================
 
-export const fetchSubcategories = (categoryId: number): Promise<ApiSubcategory[]> =>
+export const fetchSubcategories = (
+  categoryId: number,
+): Promise<ApiSubcategory[]> =>
   apiFetch<ApiSubcategory[]>(
-    `${API_BASE_URL}/public/subcategory/all?cat_id=${categoryId}`
+    `${API_BASE_URL}/public/subcategory/all?cat_id=${categoryId}`,
   );
 
-export const fetchSubcategoryById = (id: number): Promise<ApiSubcategoryDetail> => {
+export const fetchSubcategoryById = (
+  id: number,
+): Promise<ApiSubcategoryDetail> => {
   // This endpoint returns the raw object directly (not wrapped in ApiResponse)
   return fetch(`${API_BASE_URL}/public/subcategory/${id}`, {
     headers: { "Content-Type": "application/json" },
