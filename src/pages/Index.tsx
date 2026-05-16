@@ -1,12 +1,20 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo } from "react";
 import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
 import AdSpace from "@/components/blog/AdSpace";
-import TrendingSidebar from "@/components/blog/TrendingSidebar";
-import { useAllBlogs, useAllCategories, useBlogHighlights } from "@/hooks/useApi";
+import {
+  useAllBlogs,
+  useAllCategories,
+  useBlogHighlights,
+  useBlogsByCategory,
+} from "@/hooks/useApi";
 import { mapApiBlogToPost, mapApiCategoryToCategory } from "@/utils/mappers";
-import { blogPosts as staticPosts, getFeaturedPosts, getTrendingPosts, getMostViewedPosts, categories as staticCategories } from "@/data/blogData";
+import {
+  blogPosts as staticPosts,
+  getFeaturedPosts,
+  categories as staticCategories,
+} from "@/data/blogData";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { Loader2 } from "lucide-react";
 import {
@@ -24,61 +32,58 @@ const Index = () => {
   const [useCarousel] = useState(true);
   const newsletterRef = useRef<HTMLDivElement>(null);
 
-  // API data
-  // const { data: apiBlogs, isLoading: blogsLoading } = useAllBlogs();
-  const { data: apiBlogHighlights, isLoading: blogsLoading } = useBlogHighlights();
+  // Featured/highlights for the hero carousel
+  const { data: apiBlogHighlights, isLoading: highlightsLoading } =
+    useBlogHighlights();
+
+  // All blogs (used when no category is selected)
+  const { data: apiAllBlogs, isLoading: allBlogsLoading } = useAllBlogs();
+
   const { data: apiCategories } = useAllCategories();
 
-  // Map API data to frontend types, fallback to static
-  const posts = useMemo(() => {
+  // Category-filtered blogs (only fires when activeCategory !== "all")
+  const { data: apiCategoryBlogs, isLoading: categoryBlogsLoading } =
+    useBlogsByCategory(activeCategory);
+
+  // Map highlights for hero
+  const heroPosts = useMemo(() => {
     if (apiBlogHighlights && apiBlogHighlights.length > 0) {
       return apiBlogHighlights.filter(b => b.status === 1).map(mapApiBlogToPost);
     }
     return staticPosts;
   }, [apiBlogHighlights]);
 
+  // Map blogs for the grid based on active category
+  const gridPosts = useMemo(() => {
+    if (activeCategory !== "all") {
+      if (apiCategoryBlogs) {
+        return apiCategoryBlogs.filter(b => b.status === 1).map(mapApiBlogToPost);
+      }
+      return [];
+    }
+    if (apiAllBlogs && apiAllBlogs.length > 0) {
+      return apiAllBlogs.filter(b => b.status === 1).map(mapApiBlogToPost);
+    }
+    return staticPosts;
+  }, [activeCategory, apiCategoryBlogs, apiAllBlogs]);
+
   const categories = useMemo(() => {
     if (apiCategories && apiCategories.length > 0) {
       return apiCategories
         .filter(c => c.status === 1)
-        .map(c => {
-          const count = posts.filter(
-            p => p.category.toLowerCase() === c.name.toLowerCase()
-          ).length;
-          return mapApiCategoryToCategory(c, count);
-        });
+        .map(c => mapApiCategoryToCategory(c, 0));
     }
     return staticCategories;
-  }, [apiCategories, posts]);
+  }, [apiCategories]);
 
-  // Featured = first 4 posts (API has no featured flag)
   const featuredPosts = useMemo(() => {
-    if (useBlogHighlights && useBlogHighlights.length > 0) return posts.slice(0, 4);
+    if (heroPosts.length > 0) return heroPosts.slice(0, 4);
     return getFeaturedPosts(4);
-  }, [useBlogHighlights, posts]);
+  }, [heroPosts]);
 
-  const filteredPosts = useMemo(() => {
-    const nonFeatured = apiBlogHighlights && apiBlogHighlights.length > 0
-      ? posts.slice(4)
-      : staticPosts.filter(p => !p.featured);
-
-    if (activeCategory === "all") return nonFeatured;
-    const cat = categories.find(c => c.slug === activeCategory);
-    if (!cat) return nonFeatured;
-    return nonFeatured.filter(
-      p => p.category.toLowerCase() === cat.name.toLowerCase()
-    );
-  }, [activeCategory, posts, categories, apiBlogHighlights]);
-
-  // const trendingPosts = useMemo(() => {
-  //   if (apiBlogs && apiBlogs.length > 0) return posts.slice(0, 4);
-  //   return getTrendingPosts(4);
-  // }, [apiBlogs, posts]);
-
-  // const mostViewedPosts = useMemo(() => {
-  //   if (apiBlogs && apiBlogs.length > 0) return posts.slice(0, 4);
-  //   return getMostViewedPosts(4);
-  // }, [apiBlogs, posts]);
+  const filteredPosts = gridPosts;
+  const blogsLoading =
+    activeCategory !== "all" ? categoryBlogsLoading : allBlogsLoading;
 
   const { displayedItems, hasMore, isLoading, loaderRef } = useInfiniteScroll({
     items: filteredPosts,
@@ -115,7 +120,7 @@ const Index = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="container">
-          {blogsLoading ? (
+          {highlightsLoading ? (
             <SkeletonCard variant="featured" />
           ) : useCarousel && featuredPosts.length > 1 ? (
             <Carousel opts={{ align: "start", loop: true }} className="w-full">
@@ -169,40 +174,6 @@ const Index = () => {
             onCategoryChange={setActiveCategory}
             categories={categories}
           />
-        </div>
-      </motion.section>
-
-      {/* Trending & Most Viewed Section */}
-      <motion.section 
-        className="py-12 bg-secondary/20"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="container">
-          <motion.div 
-            className="grid lg:grid-cols-2 gap-8"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            {/* <motion.div variants={itemVariants}>
-              <TrendingSidebar
-                trendingPosts={trendingPosts}
-                mostViewedPosts={[]}
-                title="Trending Now"
-              />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <TrendingSidebar
-                trendingPosts={[]}
-                mostViewedPosts={mostViewedPosts}
-                title="Most Viewed"
-              />
-            </motion.div> */}
-          </motion.div>
         </div>
       </motion.section>
 

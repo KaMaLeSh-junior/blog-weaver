@@ -6,7 +6,7 @@ import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
 import SortFilter from "@/components/blog/SortFilter";
 import AdSpace from "@/components/blog/AdSpace";
-import { useAllBlogs, useAllCategories } from "@/hooks/useApi";
+import { useAllBlogs, useAllCategories, useBlogsByCategory } from "@/hooks/useApi";
 import { mapApiBlogToPost, mapApiCategoryToCategory, getSortedApiPosts, SortOption } from "@/utils/mappers";
 import { blogPosts as staticPosts, categories as staticCategories, getSortedPosts } from "@/data/blogData";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -42,15 +42,23 @@ const ExploreBlogs = () => {
   const { t } = useLanguage();
   const advertiseState = false;
 
-  const { data: apiBlogs, isLoading: blogsLoading } = useAllBlogs();
+  const { data: apiBlogs, isLoading: allBlogsLoading } = useAllBlogs();
   const { data: apiCategories } = useAllCategories();
+  const { data: apiCategoryBlogs, isLoading: categoryBlogsLoading } =
+    useBlogsByCategory(activeCategory, selectedSubcategories);
+
+  const blogsLoading =
+    activeCategory !== "all" ? categoryBlogsLoading : allBlogsLoading;
 
   const posts = useMemo(() => {
+    if (activeCategory !== "all" && apiCategoryBlogs) {
+      return apiCategoryBlogs.filter(b => b.status === 1).map(mapApiBlogToPost);
+    }
     if (apiBlogs && apiBlogs.length > 0) {
       return apiBlogs.filter(b => b.status === 1).map(mapApiBlogToPost);
     }
     return staticPosts;
-  }, [apiBlogs]);
+  }, [apiBlogs, apiCategoryBlogs, activeCategory]);
 
   const categories = useMemo(() => {
     if (apiCategories && apiCategories.length > 0) {

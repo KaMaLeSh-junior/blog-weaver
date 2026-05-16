@@ -213,34 +213,7 @@ const Header = () => {
                 ))}
                 
                 <div className="border-t border-border my-4" />
-                
-                <form
-                  className="sheet-menu-item px-4"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (searchInput.trim()) {
-                      navigate(`/explore?search=${encodeURIComponent(searchInput.trim())}`);
-                      setIsSheetOpen(false);
-                      setSearchInput("");
-                    }
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="text"
-                      placeholder={t.common.search}
-                      value={searchInput}
-                      onChange={(e) => setSearchInput(e.target.value)}
-                      className="flex-1 h-9"
-                    />
-                    <Button type="submit" size="icon" variant="ghost">
-                      <Search className="h-5 w-5" />
-                    </Button>
-                  </div>
-                </form>
-                
-                <div className="border-t border-border my-4" />
-                
+
                 <div className="sheet-menu-item px-4">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-sm text-muted-foreground">{t.nav.language}</span>
