@@ -54,23 +54,16 @@ export const fetchBlogBySlug = (slug: string): Promise<ApiBlogPost> =>
 
 export const fetchBlogsByCategory = (
   category: string,
-): Promise<ApiBlogPost[]> =>
-  apiFetch<ApiBlogPost[]>(`${API_BASE_URL}/public/blogs/getBlogsByCategory`, {
-    method: "POST",
-    body: JSON.stringify({ category: category }),
-  });
-
-export const fetchBlogsBySubcategory = (
-  categorySlug: string,
-  subcategorySlug: string[],
-): Promise<ApiBlogPost[]> =>
-  apiFetch<ApiBlogPost[]>(
-    `${API_BASE_URL}/public/blogs/getBlogsBySubcategory`,
-    {
-      method: "POST",
-      body: JSON.stringify({ category: categorySlug, subcategory: subcategorySlug }),
-    },
+  subcategory?: string[],
+): Promise<ApiBlogPost[]> => {
+  const params = new URLSearchParams({ category });
+  if (subcategory && subcategory.length > 0) {
+    params.set("subcategory", subcategory.join(","));
+  }
+  return apiFetch<ApiBlogPost[]>(
+    `${API_BASE_URL}/public/blogs/blogByCategory?${params.toString()}`,
   );
+};
 
 // ============================================
 // Categories

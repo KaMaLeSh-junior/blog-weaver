@@ -9,7 +9,6 @@ import {
   fetchSubcategoryById,
   fetchBlogHighlights,
   fetchBlogsByCategory,
-  fetchBlogsBySubcategory,
 } from "@/services/blogService";
 
 // ============================================
@@ -39,21 +38,14 @@ export const useBlogHighlights = () =>
     queryFn: fetchBlogHighlights,
   });
 
-export const useBlogsByCategory = (category: string) =>
-  useQuery({
-    queryKey: ["blogsByCategory", category],
-    queryFn: () => fetchBlogsByCategory(category),
-    enabled: !!category,
-  });
-
-export const useBlogsBySubcategory = (
-  categorySlug: string,
-  subcategorySlug: string[],
+export const useBlogsByCategory = (
+  category: string,
+  subcategory: string[] = [],
 ) =>
   useQuery({
-    queryKey: ["blogsBySubcategory", categorySlug, subcategorySlug],
-    queryFn: () => fetchBlogsBySubcategory(categorySlug, subcategorySlug),
-    enabled: subcategorySlug.length > 0,
+    queryKey: ["blogsByCategory", category, subcategory],
+    queryFn: () => fetchBlogsByCategory(category, subcategory),
+    enabled: !!category && category !== "all",
   });
 
 export const useBlogBySlug = (slug: string) =>
