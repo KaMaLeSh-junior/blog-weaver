@@ -120,7 +120,7 @@ const Index = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className="container">
-          {blogsLoading ? (
+          {highlightsLoading ? (
             <SkeletonCard variant="featured" />
           ) : useCarousel && featuredPosts.length > 1 ? (
             <Carousel opts={{ align: "start", loop: true }} className="w-full">
@@ -174,40 +174,6 @@ const Index = () => {
             onCategoryChange={setActiveCategory}
             categories={categories}
           />
-        </div>
-      </motion.section>
-
-      {/* Trending & Most Viewed Section */}
-      <motion.section 
-        className="py-12 bg-secondary/20"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="container">
-          <motion.div 
-            className="grid lg:grid-cols-2 gap-8"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            {/* <motion.div variants={itemVariants}>
-              <TrendingSidebar
-                trendingPosts={trendingPosts}
-                mostViewedPosts={[]}
-                title="Trending Now"
-              />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-              <TrendingSidebar
-                trendingPosts={[]}
-                mostViewedPosts={mostViewedPosts}
-                title="Most Viewed"
-              />
-            </motion.div> */}
-          </motion.div>
         </div>
       </motion.section>
 
