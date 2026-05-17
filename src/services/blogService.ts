@@ -52,17 +52,54 @@ export const fetchBlogBySlug = (slug: string): Promise<ApiBlogPost> =>
     body: JSON.stringify({ slug }),
   });
 
-export const fetchBlogsByCategory = (
-  category: string,
-  subcategory?: string[],
-): Promise<ApiBlogPost[]> => {
-  const params = new URLSearchParams({ category });
-  if (subcategory && subcategory.length > 0) {
-    params.set("subcategory", subcategory.join(","));
+export interface FilteredSearchParams {
+  category?: string;
+  subcategory?: string[];
+  search?: string;
+  page?: number;
+}
+
+export interface PaginatedBlogs {
+  data: ApiBlogPost[];
+  pagination: { total: number; currentPage: number; totalPages: number };
+}
+
+export const fetchFilteredSearch = async (
+  params: FilteredSearchParams,
+): Promise<PaginatedBlogs> => {
+  const qs = new URLSearchParams();
+  if (params.category && params.category !== "all") {
+    qs.set("category", params.category);
   }
-  return apiFetch<ApiBlogPost[]>(
-    `${API_BASE_URL}/public/blogs/blogByCategory?${params.toString()}`,
+  if (params.subcategory && params.subcategory.length > 0) {
+    qs.set("subcategory", params.subcategory.join(","));
+  }
+  if (params.search && params.search.trim()) {
+    qs.set("search", params.search.trim());
+  }
+  if (params.page) {
+    qs.set("page", String(params.page));
+  }
+
+  const res = await fetch(
+    `${API_BASE_URL}/public/blogs/filteredSearch?${qs.toString()}`,
+    { headers: { "Content-Type": "application/json" } },
   );
+  if (!res.ok) {
+    throw new Error(`API error: ${res.status} ${res.statusText}`);
+  }
+  const json = await res.json();
+  if (json.status !== 1) {
+    throw new Error(json.message || "Unknown API error");
+  }
+  return {
+    data: json.data || [],
+    pagination: json.pagination || {
+      total: json.data?.length || 0,
+      currentPage: 1,
+      totalPages: 1,
+    },
+  };
 };
 
 // ============================================
