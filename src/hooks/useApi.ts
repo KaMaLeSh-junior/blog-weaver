@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import {
   fetchGeneralSettings,
   fetchAllBlogs,
@@ -8,7 +8,8 @@ import {
   fetchSubcategories,
   fetchSubcategoryById,
   fetchBlogHighlights,
-  fetchBlogsByCategory,
+  fetchFilteredSearch,
+  type FilteredSearchParams,
 } from "@/services/blogService";
 
 // ============================================
@@ -19,7 +20,7 @@ export const useGeneralSettings = () =>
   useQuery({
     queryKey: ["generalSettings"],
     queryFn: fetchGeneralSettings,
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 10,
   });
 
 // ============================================
@@ -38,14 +39,35 @@ export const useBlogHighlights = () =>
     queryFn: fetchBlogHighlights,
   });
 
-export const useBlogsByCategory = (
-  category: string,
-  subcategory: string[] = [],
-) =>
+/**
+ * Single-page filtered search. Used by the home page category browser
+ * where we don't need pagination — the API returns page 1.
+ */
+export const useFilteredSearch = (params: FilteredSearchParams, enabled = true) =>
   useQuery({
-    queryKey: ["blogsByCategory", category, subcategory],
-    queryFn: () => fetchBlogsByCategory(category, subcategory),
-    enabled: !!category && category !== "all",
+    queryKey: ["filteredSearch", params],
+    queryFn: () => fetchFilteredSearch(params),
+    enabled,
+  });
+
+/**
+ * Infinite-scroll filtered search. Used by the master search results page
+ * and the explore blogs page.
+ */
+export const useFilteredSearchInfinite = (
+  params: Omit<FilteredSearchParams, "page">,
+  enabled = true,
+) =>
+  useInfiniteQuery({
+    queryKey: ["filteredSearchInfinite", params],
+    queryFn: ({ pageParam = 1 }) =>
+      fetchFilteredSearch({ ...params, page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { currentPage, totalPages } = lastPage.pagination;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    enabled,
   });
 
 export const useBlogBySlug = (slug: string) =>
