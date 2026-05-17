@@ -7,7 +7,7 @@ import {
   useAllBlogs,
   useAllCategories,
   useBlogHighlights,
-  useBlogsByCategory,
+  useFilteredSearch,
 } from "@/hooks/useApi";
 import { mapApiBlogToPost, mapApiCategoryToCategory } from "@/utils/mappers";
 import {
@@ -42,8 +42,12 @@ const Index = () => {
   const { data: apiCategories } = useAllCategories();
 
   // Category-filtered blogs (only fires when activeCategory !== "all")
-  const { data: apiCategoryBlogs, isLoading: categoryBlogsLoading } =
-    useBlogsByCategory(activeCategory);
+  const { data: apiCategoryData, isLoading: categoryBlogsLoading } =
+    useFilteredSearch(
+      { category: activeCategory },
+      activeCategory !== "all",
+    );
+  const apiCategoryBlogs = apiCategoryData?.data;
 
   // Map highlights for hero
   const heroPosts = useMemo(() => {

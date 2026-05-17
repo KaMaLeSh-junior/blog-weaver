@@ -100,8 +100,9 @@ const Header = () => {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (searchInput.trim()) {
-                    navigate(`/explore?search=${encodeURIComponent(searchInput.trim())}`);
+                  const q = searchInput.trim();
+                  if (q) {
+                    navigate(`/search?q=${encodeURIComponent(q)}`);
                     setSearchInput("");
                   }
                 }}
@@ -160,9 +161,9 @@ const Header = () => {
 
           {/* Search */}
           <button
-            onClick={() => navigate("/explore", { state: { focusSearch: true } })}
+            onClick={() => navigate("/search")}
             className={`flex flex-col items-center justify-center gap-1 flex-1 py-2 transition-colors ${
-              location.pathname === "/explore" && location.search.includes("search")
+              location.pathname === "/search"
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground"
             }`}
