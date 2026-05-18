@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAppSettings } from "@/hooks/useAppSettings";
+import BrandLogo from "@/components/BrandLogo";
 import {
   Sheet,
   SheetContent,
@@ -24,6 +26,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { showSubscription } = useAppSettings();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -73,12 +76,7 @@ const Header = () => {
         <div className="container">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center transition-transform group-hover:scale-110">
-                <span className="text-primary-foreground font-heading font-bold text-lg">C</span>
-              </div>
-              <span className="font-heading font-bold text-xl text-foreground">ClarityMFG</span>
-            </Link>
+            <BrandLogo textClassName="text-foreground" />
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-1">
