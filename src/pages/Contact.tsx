@@ -81,10 +81,20 @@ const Contact = () => {
                   </div>
                   <div>
                     <p className="font-medium">{info.label}</p>
-                    <p className="text-muted-foreground">{info.value}</p>
+                    {info.href ? (
+                      <a href={info.href} className="text-muted-foreground hover:text-primary transition-colors">
+                        {info.value}
+                      </a>
+                    ) : (
+                      <p className="text-muted-foreground">{info.value}</p>
+                    )}
                   </div>
                 </div>
               ))}
+              <div className="pt-2">
+                <p className="font-medium mb-3">Follow Us</p>
+                <SocialLinksList />
+              </div>
             </div>
 
             {/* Contact Form */}
