@@ -12,24 +12,32 @@ export interface ApiResponse<T> {
 // General Settings
 // ============================================
 
-export interface SocialLinks {
-  github: string;
-  linkedin: string;
-  instagram: string;
-  enabled: {
-    github: boolean;
-    linkedin: boolean;
-    instagram: boolean;
-  };
+export interface SocialLink {
+  url: string;
+  status: boolean;
 }
+
+export type SocialPlatform =
+  | "github"
+  | "threads"
+  | "twitter"
+  | "facebook"
+  | "linkedin"
+  | "instagram";
+
+export type SocialLinks = Partial<Record<SocialPlatform, SocialLink>>;
 
 export interface GeneralSettings {
   id: number;
   title: string;
+  email?: string;
+  phone?: string;
   address: string;
   social_links: SocialLinks;
   site_description: string;
   advertisment: number;
+  subscription?: number;
+  logo_image?: string | null;
 }
 
 // ============================================
