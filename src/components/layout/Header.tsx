@@ -230,9 +230,11 @@ const Header = () => {
                   <Link to="/signin" className="flex-1" onClick={() => setIsSheetOpen(false)}>
                     <Button variant="outline" className="w-full">{t.nav.signIn}</Button>
                   </Link>
-                  <Link to="/signup" className="flex-1" onClick={() => setIsSheetOpen(false)}>
-                    <Button className="w-full">{t.nav.subscribe}</Button>
-                  </Link>
+                  {showSubscription && (
+                    <Link to="/signup" className="flex-1" onClick={() => setIsSheetOpen(false)}>
+                      <Button className="w-full">{t.nav.subscribe}</Button>
+                    </Link>
+                  )}
                 </div>
               </div>
             </SheetContent>
