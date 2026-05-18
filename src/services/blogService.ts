@@ -33,8 +33,8 @@ async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
 // General Settings
 // ============================================
 
-export const fetchGeneralSettings = (): Promise<GeneralSettings[]> =>
-  apiFetch<GeneralSettings[]>(`${API_BASE_URL}/public/settings`);
+export const fetchGeneralSettings = (): Promise<GeneralSettings> =>
+  apiFetch<GeneralSettings>(`${API_BASE_URL}/public/settings`);
 
 // ============================================
 // Blogs
