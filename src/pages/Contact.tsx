@@ -9,6 +9,8 @@ import { useEffect } from "react";
 import gsap from "gsap";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import AdSpace from "@/components/blog/AdSpace";
+import { useAppSettings } from "@/hooks/useAppSettings";
+import SocialLinksList from "@/components/SocialLinksList";
 
 const Contact = () => {
   const [name, setName] = useState("");
@@ -43,10 +45,12 @@ const Contact = () => {
     }, 1500);
   };
 
+  const { settings } = useAppSettings();
   const contactInfo = [
-    { icon: Mail, label: "Email", value: "contact@clarityMFG.com" },
-    { icon: MapPin, label: "Address", value: "Coimbatore, Tamil Nadu, India" },
-  ];
+    settings.email && { icon: Mail, label: "Email", value: settings.email, href: `mailto:${settings.email}` },
+    settings.phone && { icon: Phone, label: "Phone", value: settings.phone, href: `tel:${settings.phone}` },
+    settings.address && { icon: MapPin, label: "Address", value: settings.address },
+  ].filter(Boolean) as Array<{ icon: typeof Mail; label: string; value: string; href?: string }>;
 
   return (
     <Layout
