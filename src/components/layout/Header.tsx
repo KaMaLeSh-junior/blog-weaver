@@ -135,9 +135,11 @@ const Header = () => {
                 </Button>
               </Link>
 
-              <Link to="/signup" className="hidden sm:block">
-                <Button size="sm">{t.nav.subscribe}</Button>
-              </Link>
+              {showSubscription && (
+                <Link to="/signup" className="hidden sm:block">
+                  <Button size="sm">{t.nav.subscribe}</Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
