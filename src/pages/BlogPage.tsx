@@ -18,6 +18,7 @@ import { Clock, Share2, Bookmark, Facebook, Twitter, Linkedin } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import SocialLinksList from "@/components/SocialLinksList";
 
 const BlogPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -203,6 +204,17 @@ const BlogPage = () => {
               <AdSpace variant="square" />
             </div>
           </aside>
+        </div>
+
+        {/* Connect / Follow Us */}
+        <div className="max-w-3xl mx-auto pb-12">
+          <div className="bg-card rounded-2xl p-8 text-center shadow-card">
+            <h3 className="font-heading text-xl font-bold mb-2">Stay Connected</h3>
+            <p className="text-muted-foreground text-sm mb-6">
+              Follow us on social media for more articles like this.
+            </p>
+            <SocialLinksList className="justify-center" />
+          </div>
         </div>
       </article>
 
