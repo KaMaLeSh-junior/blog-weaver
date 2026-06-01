@@ -20,6 +20,7 @@ import Contact from "./pages/Contact";
 import Sitemap from "./pages/Sitemap";
 import NotFound from "./pages/NotFound";
 import CookieConsent from "./components/CookieConsent";
+import { SettingsSync } from "@/hooks/useAppSettings";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
     <HelmetProvider>
       <LanguageProvider>
         <QueryClientProvider client={queryClient}>
+          <SettingsSync />
           <TooltipProvider>
             <Toaster />
             <Sonner />
