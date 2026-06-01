@@ -142,48 +142,39 @@ const ExploreBlogs = () => {
     }
   }, [location, navigate]);
 
-  // Sort the active list (server-filtered or all)
-  const sourcePosts = hasFilters ? filteredApiPosts : allPosts;
+  // Sort the active list (works for both filtered + unfiltered server pages)
   const sortedPosts = useMemo(
     () =>
       apiBlogs && apiBlogs.length > 0
-        ? getSortedApiPosts(sourcePosts, sortBy)
-        : getSortedPosts(sourcePosts, sortBy),
-    [sourcePosts, sortBy, apiBlogs],
+        ? getSortedApiPosts(activePosts, sortBy)
+        : getSortedPosts(activePosts, sortBy),
+    [activePosts, sortBy, apiBlogs],
   );
 
-  // Local infinite scroll for the unfiltered "all blogs" view
-  const localInfinite = useInfiniteScroll({
-    items: sortedPosts,
-    itemsPerPage: 6,
-  });
-
-  // Server infinite-scroll observer when filters are active
+  // Single shared infinite-scroll observer for both filtered + unfiltered
   useEffect(() => {
-    if (!hasFilters || !apiLoaderRef.current) return;
+    if (!apiLoaderRef.current) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (
           entries[0].isIntersecting &&
-          hasNextPage &&
-          !isFetchingNextPage
+          active.hasNextPage &&
+          !active.isFetchingNextPage
         ) {
-          fetchNextPage();
+          active.fetchNextPage();
         }
       },
       { threshold: 0.1, rootMargin: "200px" },
     );
     observer.observe(apiLoaderRef.current);
     return () => observer.disconnect();
-  }, [hasFilters, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [active]);
 
-  const displayedItems = hasFilters ? sortedPosts : localInfinite.displayedItems;
-  const totalItems = hasFilters ? filteredTotal : localInfinite.totalItems;
-  const showingMore = hasFilters
-    ? isFetchingNextPage
-    : localInfinite.isLoading;
-  const moreAvailable = hasFilters ? hasNextPage : localInfinite.hasMore;
-  const blogsLoading = hasFilters ? filteredLoading : allBlogsLoading;
+  const displayedItems = sortedPosts;
+  const totalItems = activeTotal;
+  const showingMore = active.isFetchingNextPage;
+  const moreAvailable = active.hasNextPage;
+  const blogsLoading = active.isLoading;
 
   return (
     <Layout
