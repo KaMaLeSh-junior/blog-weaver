@@ -3,12 +3,14 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import authReducer from "./slices/authSlice";
 import blogReducer from "./slices/blogSlice";
 import uiReducer from "./slices/uiSlice";
+import settingsReducer from "./slices/settingsSlice";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     blog: blogReducer,
     ui: uiReducer,
+    settings: settingsReducer,
   },
 });
 

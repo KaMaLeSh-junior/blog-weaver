@@ -8,6 +8,7 @@ import SortFilter from "@/components/blog/SortFilter";
 import AdSpace from "@/components/blog/AdSpace";
 import {
   useAllBlogs,
+  useAllBlogsInfinite,
   useAllCategories,
   useFilteredSearchInfinite,
 } from "@/hooks/useApi";
@@ -23,7 +24,6 @@ import {
   getSortedPosts,
 } from "@/data/blogData";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { motion, AnimatePresence } from "framer-motion";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
 import { Input } from "@/components/ui/input";
@@ -67,17 +67,15 @@ const ExploreBlogs = () => {
     selectedSubcategories.length > 0 ||
     submittedSearch.trim().length > 0;
 
-  const { data: apiBlogs, isLoading: allBlogsLoading } = useAllBlogs();
+  // Flat list (for category counts)
+  const { data: apiBlogs } = useAllBlogs();
   const { data: apiCategories } = useAllCategories();
 
+  // Server-side infinite list for the unfiltered "all" view
+  const allInfinite = useAllBlogsInfinite(10, !hasFilters);
+
   // Server-side infinite filtered search whenever any filter is active
-  const {
-    data: filteredData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading: filteredLoading,
-  } = useFilteredSearchInfinite(
+  const filteredInfinite = useFilteredSearchInfinite(
     {
       category: activeCategory,
       subcategory: selectedSubcategories,
@@ -86,15 +84,17 @@ const ExploreBlogs = () => {
     hasFilters,
   );
 
-  const filteredApiPosts = useMemo(() => {
-    if (!filteredData) return [];
-    return filteredData.pages
+  const active = hasFilters ? filteredInfinite : allInfinite;
+  const allBlogsLoading = active.isLoading;
+
+  const activePosts = useMemo(() => {
+    if (!active.data) return [];
+    return active.data.pages
       .flatMap((p) => p.data)
       .filter((b) => b.status === 1)
       .map(mapApiBlogToPost);
-  }, [filteredData]);
-  const filteredTotal =
-    filteredData?.pages[0]?.pagination.total ?? filteredApiPosts.length;
+  }, [active.data]);
+  const activeTotal = active.data?.pages[0]?.pagination.total ?? activePosts.length;
 
   const allPosts = useMemo(() => {
     if (apiBlogs && apiBlogs.length > 0) {
@@ -142,48 +142,39 @@ const ExploreBlogs = () => {
     }
   }, [location, navigate]);
 
-  // Sort the active list (server-filtered or all)
-  const sourcePosts = hasFilters ? filteredApiPosts : allPosts;
+  // Sort the active list (works for both filtered + unfiltered server pages)
   const sortedPosts = useMemo(
     () =>
       apiBlogs && apiBlogs.length > 0
-        ? getSortedApiPosts(sourcePosts, sortBy)
-        : getSortedPosts(sourcePosts, sortBy),
-    [sourcePosts, sortBy, apiBlogs],
+        ? getSortedApiPosts(activePosts, sortBy)
+        : getSortedPosts(activePosts, sortBy),
+    [activePosts, sortBy, apiBlogs],
   );
 
-  // Local infinite scroll for the unfiltered "all blogs" view
-  const localInfinite = useInfiniteScroll({
-    items: sortedPosts,
-    itemsPerPage: 6,
-  });
-
-  // Server infinite-scroll observer when filters are active
+  // Single shared infinite-scroll observer for both filtered + unfiltered
   useEffect(() => {
-    if (!hasFilters || !apiLoaderRef.current) return;
+    if (!apiLoaderRef.current) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (
           entries[0].isIntersecting &&
-          hasNextPage &&
-          !isFetchingNextPage
+          active.hasNextPage &&
+          !active.isFetchingNextPage
         ) {
-          fetchNextPage();
+          active.fetchNextPage();
         }
       },
       { threshold: 0.1, rootMargin: "200px" },
     );
     observer.observe(apiLoaderRef.current);
     return () => observer.disconnect();
-  }, [hasFilters, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [active]);
 
-  const displayedItems = hasFilters ? sortedPosts : localInfinite.displayedItems;
-  const totalItems = hasFilters ? filteredTotal : localInfinite.totalItems;
-  const showingMore = hasFilters
-    ? isFetchingNextPage
-    : localInfinite.isLoading;
-  const moreAvailable = hasFilters ? hasNextPage : localInfinite.hasMore;
-  const blogsLoading = hasFilters ? filteredLoading : allBlogsLoading;
+  const displayedItems = sortedPosts;
+  const totalItems = activeTotal;
+  const showingMore = active.isFetchingNextPage;
+  const moreAvailable = active.hasNextPage;
+  const blogsLoading = active.isLoading;
 
   return (
     <Layout
@@ -342,7 +333,7 @@ const ExploreBlogs = () => {
           )}
 
           <div
-            ref={hasFilters ? apiLoaderRef : localInfinite.loaderRef}
+            ref={apiLoaderRef}
             className="flex justify-center py-8"
           >
             {showingMore && (

@@ -1,5 +1,12 @@
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/store";
 import { useGeneralSettings } from "@/hooks/useApi";
-import type { GeneralSettings, SocialLinks, SocialPlatform } from "@/types/api";
+import { setSettings } from "@/store/slices/settingsSlice";
+import type {
+  GeneralSettings,
+  SocialLinks,
+  SocialPlatform,
+} from "@/types/api";
 
 const FALLBACK: GeneralSettings = {
   id: 0,
@@ -7,28 +14,45 @@ const FALLBACK: GeneralSettings = {
   email: "",
   phone: "",
   address: "",
+  logo: [],
+  logo_image: null,
   social_links: {},
   site_description:
     "Insights on industrial automation, mechatronics, robotics and connected mobility.",
-  advertisment: 0,
-  subscription: 0,
-  logo_image: null,
+  advertisment: false,
+  subscription: false,
+  banner_image_limit: 10,
 };
 
 /**
- * Convenience hook that exposes the app's general settings with sensible
- * defaults so consumers never need to null-check the API response.
+ * Reads normalized general settings from Redux. The actual fetch + dispatch
+ * happens once at the app root via <SettingsSync />.
  */
 export const useAppSettings = () => {
-  const { data, isLoading, error } = useGeneralSettings();
-  const settings: GeneralSettings = data || FALLBACK;
+  const stored = useAppSelector((s) => s.settings.data);
+  const isLoaded = useAppSelector((s) => s.settings.isLoaded);
+  const settings: GeneralSettings = stored || FALLBACK;
   return {
     settings,
-    isLoading,
-    error,
-    showAds: settings.advertisment === 1,
-    showSubscription: settings.subscription === 1,
+    isLoading: !isLoaded,
+    showAds: settings.advertisment === true,
+    showSubscription: settings.subscription === true,
   };
+};
+
+/**
+ * Mount once at the app root. Fetches `/public/settings` via React Query and
+ * hydrates the Redux settings slice so the rest of the app can read it.
+ */
+export const SettingsSync = () => {
+  const dispatch = useAppDispatch();
+  const { data } = useGeneralSettings();
+  useEffect(() => {
+    if (data) {
+      dispatch(setSettings(data));
+    }
+  }, [data, dispatch]);
+  return null;
 };
 
 export const getEnabledSocialLinks = (

@@ -2,6 +2,7 @@ import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import {
   fetchGeneralSettings,
   fetchAllBlogs,
+  fetchBlogsPage,
   fetchBlogBySlug,
   fetchAllCategories,
   fetchCategoryById,
@@ -9,7 +10,9 @@ import {
   fetchSubcategoryById,
   fetchBlogHighlights,
   fetchFilteredSearch,
+  fetchSearchBlogs,
   type FilteredSearchParams,
+  type PaginatedBlogs,
 } from "@/services/blogService";
 
 // ============================================
@@ -27,10 +30,31 @@ export const useGeneralSettings = () =>
 // Blogs
 // ============================================
 
+/**
+ * Flat list (page 1, large limit). Used by pages that only need related-post
+ * lookups or category counts.
+ */
 export const useAllBlogs = () =>
   useQuery({
     queryKey: ["blogs"],
     queryFn: fetchAllBlogs,
+  });
+
+/**
+ * Paginated infinite-scroll list of all blogs. Used by Explore (unfiltered)
+ * and the home page (when no category is selected).
+ */
+export const useAllBlogsInfinite = (limit = 10, enabled = true) =>
+  useInfiniteQuery<PaginatedBlogs>({
+    queryKey: ["blogsInfinite", limit],
+    queryFn: ({ pageParam = 1 }) =>
+      fetchBlogsPage({ page: pageParam as number, limit }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { currentPage, totalPages } = lastPage.pagination;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    enabled,
   });
 
 export const useBlogHighlights = () =>
@@ -39,10 +63,7 @@ export const useBlogHighlights = () =>
     queryFn: fetchBlogHighlights,
   });
 
-/**
- * Single-page filtered search. Used by the home page category browser
- * where we don't need pagination — the API returns page 1.
- */
+/** Single-page filtered search. */
 export const useFilteredSearch = (params: FilteredSearchParams, enabled = true) =>
   useQuery({
     queryKey: ["filteredSearch", params],
@@ -50,24 +71,39 @@ export const useFilteredSearch = (params: FilteredSearchParams, enabled = true) 
     enabled,
   });
 
-/**
- * Infinite-scroll filtered search. Used by the master search results page
- * and the explore blogs page.
- */
+/** Infinite-scroll filtered search. */
 export const useFilteredSearchInfinite = (
   params: Omit<FilteredSearchParams, "page">,
   enabled = true,
 ) =>
-  useInfiniteQuery({
+  useInfiniteQuery<PaginatedBlogs>({
     queryKey: ["filteredSearchInfinite", params],
     queryFn: ({ pageParam = 1 }) =>
-      fetchFilteredSearch({ ...params, page: pageParam }),
+      fetchFilteredSearch({ ...params, page: pageParam as number }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       const { currentPage, totalPages } = lastPage.pagination;
       return currentPage < totalPages ? currentPage + 1 : undefined;
     },
     enabled,
+  });
+
+/** Infinite-scroll master search (`/public/blogs/search?blog=`). */
+export const useSearchBlogsInfinite = (
+  blog: string,
+  limit = 10,
+  enabled = true,
+) =>
+  useInfiniteQuery<PaginatedBlogs>({
+    queryKey: ["searchBlogsInfinite", blog, limit],
+    queryFn: ({ pageParam = 1 }) =>
+      fetchSearchBlogs({ blog, page: pageParam as number, limit }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { currentPage, totalPages } = lastPage.pagination;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    enabled: enabled && blog.trim().length > 0,
   });
 
 export const useBlogBySlug = (slug: string) =>

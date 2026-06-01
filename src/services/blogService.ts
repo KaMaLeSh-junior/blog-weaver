@@ -1,7 +1,7 @@
 import { API_BASE_URL } from "@/config/api";
 import type {
   ApiResponse,
-  GeneralSettings,
+  RawGeneralSettings,
   ApiBlogPost,
   ApiCategory,
   ApiCategoryDetail,
@@ -33,15 +33,57 @@ async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
 // General Settings
 // ============================================
 
-export const fetchGeneralSettings = (): Promise<GeneralSettings> =>
-  apiFetch<GeneralSettings>(`${API_BASE_URL}/public/settings`);
+export const fetchGeneralSettings = (): Promise<RawGeneralSettings> =>
+  apiFetch<RawGeneralSettings>(`${API_BASE_URL}/public/settings`);
 
 // ============================================
 // Blogs
 // ============================================
 
-export const fetchAllBlogs = (): Promise<ApiBlogPost[]> =>
-  apiFetch<ApiBlogPost[]>(`${API_BASE_URL}/public/blogs`);
+export interface PaginatedBlogs {
+  data: ApiBlogPost[];
+  pagination: { total: number; currentPage: number; totalPages: number };
+}
+
+const DEFAULT_PAGE_SIZE = 10;
+
+async function fetchPaginatedBlogs(url: string): Promise<PaginatedBlogs> {
+  const res = await fetch(url, { headers: { "Content-Type": "application/json" } });
+  if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`);
+  const json = await res.json();
+  if (json.status !== 1) throw new Error(json.message || "Unknown API error");
+  const data: ApiBlogPost[] = json.data || [];
+  return {
+    data,
+    pagination: json.pagination || {
+      total: data.length,
+      currentPage: 1,
+      totalPages: 1,
+    },
+  };
+}
+
+export interface BlogListParams {
+  page?: number;
+  limit?: number;
+}
+
+export const fetchBlogsPage = ({
+  page = 1,
+  limit = DEFAULT_PAGE_SIZE,
+}: BlogListParams = {}): Promise<PaginatedBlogs> => {
+  const qs = new URLSearchParams({ page: String(page), limit: String(limit) });
+  return fetchPaginatedBlogs(`${API_BASE_URL}/public/blogs?${qs.toString()}`);
+};
+
+/**
+ * Backwards-compatible "fetch everything" helper used by pages that just need
+ * a flat list (related posts, counts, etc.). Pulls a large first page.
+ */
+export const fetchAllBlogs = async (): Promise<ApiBlogPost[]> => {
+  const res = await fetchBlogsPage({ page: 1, limit: 100 });
+  return res.data;
+};
 
 export const fetchBlogHighlights = (): Promise<ApiBlogPost[]> =>
   apiFetch<ApiBlogPost[]>(`${API_BASE_URL}/public/blogs/blogHighlights`);
@@ -52,54 +94,53 @@ export const fetchBlogBySlug = (slug: string): Promise<ApiBlogPost> =>
     body: JSON.stringify({ slug }),
   });
 
+export interface SearchBlogsParams {
+  blog: string;
+  page?: number;
+  limit?: number;
+}
+
+export const fetchSearchBlogs = ({
+  blog,
+  page = 1,
+  limit = DEFAULT_PAGE_SIZE,
+}: SearchBlogsParams): Promise<PaginatedBlogs> => {
+  const qs = new URLSearchParams({
+    blog,
+    page: String(page),
+    limit: String(limit),
+  });
+  return fetchPaginatedBlogs(
+    `${API_BASE_URL}/public/blogs/search?${qs.toString()}`,
+  );
+};
+
 export interface FilteredSearchParams {
   category?: string;
   subcategory?: string[];
   search?: string;
   page?: number;
+  limit?: number;
 }
 
-export interface PaginatedBlogs {
-  data: ApiBlogPost[];
-  pagination: { total: number; currentPage: number; totalPages: number };
-}
-
-export const fetchFilteredSearch = async (
-  params: FilteredSearchParams,
-): Promise<PaginatedBlogs> => {
+export const fetchFilteredSearch = ({
+  category,
+  subcategory,
+  search,
+  page,
+  limit = DEFAULT_PAGE_SIZE,
+}: FilteredSearchParams): Promise<PaginatedBlogs> => {
   const qs = new URLSearchParams();
-  if (params.category && params.category !== "all") {
-    qs.set("category", params.category);
+  if (category && category !== "all") qs.set("category", category);
+  if (subcategory && subcategory.length > 0) {
+    qs.set("subcategory", subcategory.join(","));
   }
-  if (params.subcategory && params.subcategory.length > 0) {
-    qs.set("subcategory", params.subcategory.join(","));
-  }
-  if (params.search && params.search.trim()) {
-    qs.set("search", params.search.trim());
-  }
-  if (params.page) {
-    qs.set("page", String(params.page));
-  }
-
-  const res = await fetch(
+  if (search && search.trim()) qs.set("search", search.trim());
+  if (page) qs.set("page", String(page));
+  qs.set("limit", String(limit));
+  return fetchPaginatedBlogs(
     `${API_BASE_URL}/public/blogs/filteredSearch?${qs.toString()}`,
-    { headers: { "Content-Type": "application/json" } },
   );
-  if (!res.ok) {
-    throw new Error(`API error: ${res.status} ${res.statusText}`);
-  }
-  const json = await res.json();
-  if (json.status !== 1) {
-    throw new Error(json.message || "Unknown API error");
-  }
-  return {
-    data: json.data || [],
-    pagination: json.pagination || {
-      total: json.data?.length || 0,
-      currentPage: 1,
-      totalPages: 1,
-    },
-  };
 };
 
 // ============================================
@@ -126,7 +167,6 @@ export const fetchSubcategories = (
 export const fetchSubcategoryById = (
   id: number,
 ): Promise<ApiSubcategoryDetail> => {
-  // This endpoint returns the raw object directly (not wrapped in ApiResponse)
   return fetch(`${API_BASE_URL}/public/subcategory/${id}`, {
     headers: { "Content-Type": "application/json" },
   }).then(async (res) => {
