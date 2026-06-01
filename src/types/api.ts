@@ -27,17 +27,41 @@ export type SocialPlatform =
 
 export type SocialLinks = Partial<Record<SocialPlatform, SocialLink>>;
 
+/**
+ * Raw shape returned by the API. `social_links` may arrive as a JSON-encoded
+ * string, `logo` is an array of filenames, and the feature flags are booleans.
+ */
+export interface RawGeneralSettings {
+  id: number;
+  title: string;
+  email?: string;
+  phone?: string;
+  address: string;
+  logo?: string[] | null;
+  social_links: SocialLinks | string;
+  site_description: string;
+  advertisment: boolean;
+  subscription: boolean;
+  banner_image_limit?: number;
+}
+
+/**
+ * Normalized shape consumed by the UI. Derived from `RawGeneralSettings` in
+ * the settings slice so consumers don't need to parse strings or arrays.
+ */
 export interface GeneralSettings {
   id: number;
   title: string;
   email?: string;
   phone?: string;
   address: string;
+  logo: string[];
+  logo_image: string | null;
   social_links: SocialLinks;
   site_description: string;
-  advertisment: number;
-  subscription?: number;
-  logo_image?: string | null;
+  advertisment: boolean;
+  subscription: boolean;
+  banner_image_limit: number;
 }
 
 // ============================================
