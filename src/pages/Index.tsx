@@ -1,13 +1,13 @@
-import { useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import Layout from "@/components/layout/Layout";
 import BlogCard from "@/components/blog/BlogCard";
 import CategoryFilter from "@/components/blog/CategoryFilter";
 import AdSpace from "@/components/blog/AdSpace";
 import {
-  useAllBlogs,
+  useAllBlogsInfinite,
   useAllCategories,
   useBlogHighlights,
-  useFilteredSearch,
+  useFilteredSearchInfinite,
 } from "@/hooks/useApi";
 import { mapApiBlogToPost, mapApiCategoryToCategory } from "@/utils/mappers";
 import {
@@ -15,7 +15,6 @@ import {
   getFeaturedPosts,
   categories as staticCategories,
 } from "@/data/blogData";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { Loader2 } from "lucide-react";
 import {
   Carousel,
@@ -31,51 +30,46 @@ const Index = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [useCarousel] = useState(true);
   const newsletterRef = useRef<HTMLDivElement>(null);
+  const loaderRef = useRef<HTMLDivElement>(null);
 
-  // Featured/highlights for the hero carousel
   const { data: apiBlogHighlights, isLoading: highlightsLoading } =
     useBlogHighlights();
 
-  // All blogs (used when no category is selected)
-  const { data: apiAllBlogs, isLoading: allBlogsLoading } = useAllBlogs();
+  // Infinite list when no category is selected
+  const allInfinite = useAllBlogsInfinite(10, activeCategory === "all");
+  // Infinite list when a category is selected
+  const categoryInfinite = useFilteredSearchInfinite(
+    { category: activeCategory },
+    activeCategory !== "all",
+  );
+
+  const active = activeCategory === "all" ? allInfinite : categoryInfinite;
 
   const { data: apiCategories } = useAllCategories();
 
-  // Category-filtered blogs (only fires when activeCategory !== "all")
-  const { data: apiCategoryData, isLoading: categoryBlogsLoading } =
-    useFilteredSearch(
-      { category: activeCategory },
-      activeCategory !== "all",
-    );
-  const apiCategoryBlogs = apiCategoryData?.data;
-
-  // Map highlights for hero
   const heroPosts = useMemo(() => {
     if (apiBlogHighlights && apiBlogHighlights.length > 0) {
-      return apiBlogHighlights.filter(b => b.status === 1).map(mapApiBlogToPost);
+      return apiBlogHighlights.filter((b) => b.status === 1).map(mapApiBlogToPost);
     }
     return staticPosts;
   }, [apiBlogHighlights]);
 
-  // Map blogs for the grid based on active category
   const gridPosts = useMemo(() => {
-    if (activeCategory !== "all") {
-      if (apiCategoryBlogs) {
-        return apiCategoryBlogs.filter(b => b.status === 1).map(mapApiBlogToPost);
-      }
-      return [];
+    if (active.data) {
+      const flat = active.data.pages
+        .flatMap((p) => p.data)
+        .filter((b) => b.status === 1)
+        .map(mapApiBlogToPost);
+      if (flat.length > 0) return flat;
     }
-    if (apiAllBlogs && apiAllBlogs.length > 0) {
-      return apiAllBlogs.filter(b => b.status === 1).map(mapApiBlogToPost);
-    }
-    return staticPosts;
-  }, [activeCategory, apiCategoryBlogs, apiAllBlogs]);
+    return activeCategory === "all" ? staticPosts : [];
+  }, [active.data, activeCategory]);
 
   const categories = useMemo(() => {
     if (apiCategories && apiCategories.length > 0) {
       return apiCategories
-        .filter(c => c.status === 1)
-        .map(c => mapApiCategoryToCategory(c, 0));
+        .filter((c) => c.status === 1)
+        .map((c) => mapApiCategoryToCategory(c, 0));
     }
     return staticCategories;
   }, [apiCategories]);
@@ -85,21 +79,28 @@ const Index = () => {
     return getFeaturedPosts(4);
   }, [heroPosts]);
 
-  const filteredPosts = gridPosts;
-  const blogsLoading =
-    activeCategory !== "all" ? categoryBlogsLoading : allBlogsLoading;
+  const blogsLoading = active.isLoading;
+  const hasMore = active.hasNextPage;
+  const isLoadingMore = active.isFetchingNextPage;
 
-  const { displayedItems, hasMore, isLoading, loaderRef } = useInfiniteScroll({
-    items: filteredPosts,
-    itemsPerPage: 6,
-  });
+  // Infinite scroll observer
+  useEffect(() => {
+    if (!loaderRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+          active.fetchNextPage();
+        }
+      },
+      { threshold: 0.1, rootMargin: "200px" },
+    );
+    observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [hasMore, isLoadingMore, active]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 },
-    },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
   };
 
   const itemVariants = {
@@ -117,7 +118,7 @@ const Index = () => {
       description="Discover insightful articles on industrial automation, mechatronics, robotics, and connected mobility. Stay informed with ClarityMFG."
     >
       {/* Hero Section */}
-      <motion.section 
+      <motion.section
         className="gradient-hero py-12 md:py-16 overflow-hidden"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -146,8 +147,7 @@ const Index = () => {
         </div>
       </motion.section>
 
-      {/* Ad Space */}
-      <motion.section 
+      <motion.section
         className="container py-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -156,8 +156,7 @@ const Index = () => {
         <AdSpace variant="horizontal" />
       </motion.section>
 
-      {/* Categories Section */}
-      <motion.section 
+      <motion.section
         className="py-12 md:py-16"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -181,7 +180,6 @@ const Index = () => {
         </div>
       </motion.section>
 
-      {/* Blog Grid with Infinite Scroll */}
       <section className="py-12">
         <div className="container">
           {blogsLoading ? (
@@ -192,22 +190,22 @@ const Index = () => {
             </div>
           ) : (
             <>
-              <motion.div 
+              <motion.div
                 className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
                 variants={containerVariants}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                {displayedItems.slice(0, 3).map((post) => (
+                {gridPosts.slice(0, 3).map((post) => (
                   <motion.div key={post.id} variants={itemVariants}>
                     <BlogCard post={post} />
                   </motion.div>
                 ))}
               </motion.div>
-              
-              {displayedItems.length > 3 && (
-                <motion.div 
+
+              {gridPosts.length > 3 && (
+                <motion.div
                   className="my-8"
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
@@ -217,15 +215,15 @@ const Index = () => {
                   <AdSpace variant="horizontal" />
                 </motion.div>
               )}
-              
-              <motion.div 
+
+              <motion.div
                 className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
                 variants={containerVariants}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                {displayedItems.slice(3).map((post) => (
+                {gridPosts.slice(3).map((post) => (
                   <motion.div key={post.id} variants={itemVariants}>
                     <BlogCard post={post} />
                   </motion.div>
@@ -233,23 +231,22 @@ const Index = () => {
               </motion.div>
             </>
           )}
-          
+
           <div ref={loaderRef} className="flex justify-center py-8">
-            {isLoading && (
+            {isLoadingMore && (
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="h-5 w-5 animate-spin" />
                 <span>Loading more articles...</span>
               </div>
             )}
-            {!hasMore && displayedItems.length > 0 && (
+            {!hasMore && gridPosts.length > 0 && (
               <p className="text-muted-foreground text-sm">You've reached the end</p>
             )}
           </div>
         </div>
       </section>
 
-      {/* Newsletter & Ad Section */}
-      <motion.section 
+      <motion.section
         className="py-16 bg-secondary/30"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -258,25 +255,12 @@ const Index = () => {
       >
         <div className="container">
           <div className="grid lg:grid-cols-3 gap-8" ref={newsletterRef}>
-            <div style={{display:"none"}} className="lg:col-span-2">
+            <div style={{ display: "none" }} className="lg:col-span-2">
               <div className="bg-card rounded-2xl p-8 shadow-card">
                 <h3 className="font-heading text-2xl font-bold mb-4">Stay Updated</h3>
                 <p className="text-muted-foreground mb-6">
                   Join our community and never miss an article. Get the latest insights delivered to your inbox weekly.
                 </p>
-                <form className="flex gap-3">
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="flex-1 px-4 py-3 rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                  <button
-                    type="submit"
-                    className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
-                  >
-                    Subscribe
-                  </button>
-                </form>
               </div>
             </div>
             <div>
