@@ -6,7 +6,7 @@ import BlogCard from "@/components/blog/BlogCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
-import { useFilteredSearchInfinite } from "@/hooks/useApi";
+import { useSearchBlogsInfinite } from "@/hooks/useApi";
 import { mapApiBlogToPost } from "@/utils/mappers";
 import { motion } from "framer-motion";
 
@@ -35,10 +35,7 @@ const SearchResults = () => {
     isFetchingNextPage,
     isLoading,
     isError,
-  } = useFilteredSearchInfinite(
-    { search: initialQuery },
-    initialQuery.trim().length > 0,
-  );
+  } = useSearchBlogsInfinite(initialQuery, 10, initialQuery.trim().length > 0);
 
   const posts = useMemo(() => {
     if (!data) return [];
