@@ -8,6 +8,7 @@ import SortFilter from "@/components/blog/SortFilter";
 import AdSpace from "@/components/blog/AdSpace";
 import {
   useAllBlogs,
+  useAllBlogsInfinite,
   useAllCategories,
   useFilteredSearchInfinite,
 } from "@/hooks/useApi";
@@ -23,7 +24,6 @@ import {
   getSortedPosts,
 } from "@/data/blogData";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { motion, AnimatePresence } from "framer-motion";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
 import { Input } from "@/components/ui/input";
@@ -67,17 +67,15 @@ const ExploreBlogs = () => {
     selectedSubcategories.length > 0 ||
     submittedSearch.trim().length > 0;
 
-  const { data: apiBlogs, isLoading: allBlogsLoading } = useAllBlogs();
+  // Flat list (for category counts)
+  const { data: apiBlogs } = useAllBlogs();
   const { data: apiCategories } = useAllCategories();
 
+  // Server-side infinite list for the unfiltered "all" view
+  const allInfinite = useAllBlogsInfinite(10, !hasFilters);
+
   // Server-side infinite filtered search whenever any filter is active
-  const {
-    data: filteredData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading: filteredLoading,
-  } = useFilteredSearchInfinite(
+  const filteredInfinite = useFilteredSearchInfinite(
     {
       category: activeCategory,
       subcategory: selectedSubcategories,
@@ -86,15 +84,17 @@ const ExploreBlogs = () => {
     hasFilters,
   );
 
-  const filteredApiPosts = useMemo(() => {
-    if (!filteredData) return [];
-    return filteredData.pages
+  const active = hasFilters ? filteredInfinite : allInfinite;
+  const allBlogsLoading = active.isLoading;
+
+  const activePosts = useMemo(() => {
+    if (!active.data) return [];
+    return active.data.pages
       .flatMap((p) => p.data)
       .filter((b) => b.status === 1)
       .map(mapApiBlogToPost);
-  }, [filteredData]);
-  const filteredTotal =
-    filteredData?.pages[0]?.pagination.total ?? filteredApiPosts.length;
+  }, [active.data]);
+  const activeTotal = active.data?.pages[0]?.pagination.total ?? activePosts.length;
 
   const allPosts = useMemo(() => {
     if (apiBlogs && apiBlogs.length > 0) {
