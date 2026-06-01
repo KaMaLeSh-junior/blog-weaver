@@ -333,7 +333,7 @@ const ExploreBlogs = () => {
           )}
 
           <div
-            ref={hasFilters ? apiLoaderRef : localInfinite.loaderRef}
+            ref={apiLoaderRef}
             className="flex justify-center py-8"
           >
             {showingMore && (
