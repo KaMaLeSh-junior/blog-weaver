@@ -48,7 +48,9 @@ export interface PaginatedBlogs {
 const DEFAULT_PAGE_SIZE = 10;
 
 async function fetchPaginatedBlogs(url: string): Promise<PaginatedBlogs> {
-  const res = await fetch(url, { headers: { "Content-Type": "application/json" } });
+  const res = await fetch(url, {
+    headers: { "Content-Type": "application/json" },
+  });
   if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`);
   const json = await res.json();
   if (json.status !== 1) throw new Error(json.message || "Unknown API error");

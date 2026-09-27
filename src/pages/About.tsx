@@ -11,7 +11,7 @@ const About = () => {
     gsap.fromTo(
       ".about-section",
       { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, stagger: 0.2, duration: 0.6, ease: "power2.out" }
+      { opacity: 1, y: 0, stagger: 0.2, duration: 0.6, ease: "power2.out" },
     );
   }, []);
 
@@ -30,16 +30,19 @@ const About = () => {
       {/* Hero */}
       <section className="gradient-hero py-20 about-section">
         <div className="container text-center">
-          <h1 className="font-heading text-4xl md:text-5xl font-bold mb-6">About ClarityMFG</h1>
+          <h1 className="font-heading text-4xl md:text-5xl font-bold mb-6">
+            About ClarityMFG
+          </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            We're a team of passionate engineers and writers dedicated to bringing you 
-            the most insightful content across industrial automation, mechatronics, robotics, and connected mobility.
+            We're a team of passionate engineers and writers dedicated to
+            bringing you the most insightful content across industrial
+            automation, mechatronics, robotics, and connected mobility.
           </p>
         </div>
       </section>
 
       {/* Stats */}
-      <section className="py-16 about-section">
+      <section className="py-16 about-section hidden">
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
@@ -63,39 +66,51 @@ const About = () => {
         <div className="container">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="font-heading text-3xl font-bold mb-6">Our Mission</h2>
+              <h2 className="font-heading text-3xl font-bold mb-6">
+                Our Mission
+              </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                At ClarityMFG, we believe in the power of well-crafted content to inform, 
-                inspire, and transform. Our mission is to create a platform where readers 
-                can discover thoughtful perspectives on industrial automation, robotics, mechatronics, and the future of manufacturing.
+                At ClarityMFG, we believe in the power of well-crafted content
+                to inform, inspire, and transform. Our mission is to create a
+                platform where readers can discover thoughtful perspectives on
+                industrial automation, robotics, mechatronics, and the future of
+                manufacturing.
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                We strive to maintain the highest standards of journalism while making 
-                complex topics accessible and engaging for everyone.
+                We strive to maintain the highest standards of journalism while
+                making complex topics accessible and engaging for everyone.
               </p>
             </div>
             <div className="bg-card rounded-2xl p-8 shadow-card">
-              <h3 className="font-heading text-xl font-bold mb-4">Our Values</h3>
+              <h3 className="font-heading text-xl font-bold mb-4">
+                Our Values
+              </h3>
               <ul className="space-y-4">
                 <li className="flex items-start gap-3">
                   <div className="w-2 h-2 rounded-full bg-primary mt-2" />
                   <div>
                     <p className="font-medium">Quality First</p>
-                    <p className="text-sm text-muted-foreground">Every article is carefully researched and edited.</p>
+                    <p className="text-sm text-muted-foreground">
+                      Every article is carefully researched and edited.
+                    </p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-2 h-2 rounded-full bg-primary mt-2" />
                   <div>
                     <p className="font-medium">Reader-Centric</p>
-                    <p className="text-sm text-muted-foreground">We write for our readers, not algorithms.</p>
+                    <p className="text-sm text-muted-foreground">
+                      We write for our readers, not algorithms.
+                    </p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-2 h-2 rounded-full bg-primary mt-2" />
                   <div>
                     <p className="font-medium">Diverse Perspectives</p>
-                    <p className="text-sm text-muted-foreground">We embrace different viewpoints and voices.</p>
+                    <p className="text-sm text-muted-foreground">
+                      We embrace different viewpoints and voices.
+                    </p>
                   </div>
                 </li>
               </ul>
@@ -105,18 +120,27 @@ const About = () => {
       </section>
 
       {/* Team */}
-      <section className="py-16 about-section">
+      <section className="py-16 about-section hidden">
         <div className="container">
-          <h2 className="font-heading text-3xl font-bold text-center mb-12">Meet Our Team</h2>
+          <h2 className="font-heading text-3xl font-bold text-center mb-12">
+            Meet Our Team
+          </h2>
           <div className="grid md:grid-cols-3 gap-8">
             {authors.map((author) => (
-              <div key={author.id} className="bg-card rounded-xl p-6 text-center shadow-card">
+              <div
+                key={author.id}
+                className="bg-card rounded-xl p-6 text-center shadow-card"
+              >
                 <Avatar className="h-24 w-24 mx-auto mb-4">
                   <AvatarImage src={author.avatar} alt={author.name} />
                   <AvatarFallback>{author.name[0]}</AvatarFallback>
                 </Avatar>
-                <h3 className="font-heading font-bold text-lg">{author.name}</h3>
-                <p className="text-sm text-muted-foreground mt-2">{author.bio}</p>
+                <h3 className="font-heading font-bold text-lg">
+                  {author.name}
+                </h3>
+                <p className="text-sm text-muted-foreground mt-2">
+                  {author.bio}
+                </p>
               </div>
             ))}
           </div>

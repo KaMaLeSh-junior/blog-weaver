@@ -64,7 +64,10 @@ export const useBlogHighlights = () =>
   });
 
 /** Single-page filtered search. */
-export const useFilteredSearch = (params: FilteredSearchParams, enabled = true) =>
+export const useFilteredSearch = (
+  params: FilteredSearchParams,
+  enabled = true,
+) =>
   useQuery({
     queryKey: ["filteredSearch", params],
     queryFn: () => fetchFilteredSearch(params),

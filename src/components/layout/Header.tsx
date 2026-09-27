@@ -46,7 +46,13 @@ const Header = () => {
           gsap.fromTo(
             menuItems,
             { opacity: 0, x: -20 },
-            { opacity: 1, x: 0, stagger: 0.1, duration: 0.3, ease: "power2.out" }
+            {
+              opacity: 1,
+              x: 0,
+              stagger: 0.1,
+              duration: 0.3,
+              ease: "power2.out",
+            },
           );
         }
       }, 50);
@@ -129,11 +135,11 @@ const Header = () => {
               <ThemeToggle />
               <LanguageSwitcher />
 
-              <Link to="/signin" className="hidden sm:block">
+              {/* <Link to="/signin" className="hidden sm:block">
                 <Button variant="ghost" size="sm">
                   {t.nav.signIn}
                 </Button>
-              </Link>
+              </Link> */}
 
               {showSubscription && (
                 <Link to="/signup" className="hidden sm:block">
@@ -152,7 +158,9 @@ const Header = () => {
           <Link
             to="/"
             className={`flex flex-col items-center justify-center gap-1 flex-1 py-2 transition-colors ${
-              isActive("/") ? "text-primary" : "text-muted-foreground hover:text-foreground"
+              isActive("/")
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <Home className="h-5 w-5" />
@@ -176,7 +184,9 @@ const Header = () => {
           <Link
             to="/explore"
             className={`flex flex-col items-center justify-center gap-1 flex-1 py-2 transition-colors ${
-              isActive("/explore") ? "text-primary" : "text-muted-foreground hover:text-foreground"
+              isActive("/explore")
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <BookOpen className="h-5 w-5" />
@@ -186,14 +196,15 @@ const Header = () => {
           {/* Menu Sheet */}
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
-              <button
-                className="flex flex-col items-center justify-center gap-1 flex-1 py-2 text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <button className="flex flex-col items-center justify-center gap-1 flex-1 py-2 text-muted-foreground hover:text-foreground transition-colors">
                 <Menu className="h-5 w-5" />
                 <span className="text-xs font-medium">{t.nav.menu}</span>
               </button>
             </SheetTrigger>
-            <SheetContent side="bottom" className="h-auto max-h-[70vh] rounded-t-2xl">
+            <SheetContent
+              side="bottom"
+              className="h-auto max-h-[70vh] rounded-t-2xl"
+            >
               <SheetHeader className="pb-4">
                 <SheetTitle className="text-left">{t.nav.menu}</SheetTitle>
               </SheetHeader>
@@ -212,12 +223,14 @@ const Header = () => {
                     <span className="font-medium">{link.name}</span>
                   </Link>
                 ))}
-                
+
                 <div className="border-t border-border my-4" />
 
                 <div className="sheet-menu-item px-4">
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm text-muted-foreground">{t.nav.language}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {t.nav.language}
+                    </span>
                     <LanguageSwitcher />
                   </div>
                   <div className="flex items-center justify-between mb-4">
@@ -227,11 +240,21 @@ const Header = () => {
                 </div>
 
                 <div className="sheet-menu-item flex gap-3 px-4 pt-2">
-                  <Link to="/signin" className="flex-1" onClick={() => setIsSheetOpen(false)}>
-                    <Button variant="outline" className="w-full">{t.nav.signIn}</Button>
+                  <Link
+                    to="/signin"
+                    className="flex-1"
+                    onClick={() => setIsSheetOpen(false)}
+                  >
+                    <Button variant="outline" className="w-full">
+                      {t.nav.signIn}
+                    </Button>
                   </Link>
                   {showSubscription && (
-                    <Link to="/signup" className="flex-1" onClick={() => setIsSheetOpen(false)}>
+                    <Link
+                      to="/signup"
+                      className="flex-1"
+                      onClick={() => setIsSheetOpen(false)}
+                    >
                       <Button className="w-full">{t.nav.subscribe}</Button>
                     </Link>
                   )}

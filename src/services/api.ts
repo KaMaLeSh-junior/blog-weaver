@@ -1,11 +1,12 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 // Types
 export interface ApiResponse<T> {
   data: T | null;
   error: string | null;
   status: number;
+  message?: string | null;
 }
 
 export interface PaginatedResponse<T> {
@@ -19,13 +20,13 @@ export interface PaginatedResponse<T> {
 // API Headers
 const getHeaders = (includeAuth = false): HeadersInit => {
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   };
 
   if (includeAuth) {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem("auth_token");
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
   }
 
@@ -35,13 +36,13 @@ const getHeaders = (includeAuth = false): HeadersInit => {
 // Generic fetch wrapper
 async function apiRequest<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers: {
-        ...getHeaders(options.headers?.['Authorization'] !== undefined),
+        ...getHeaders(options.headers?.["Authorization"] !== undefined),
         ...options.headers,
       },
     });
@@ -51,7 +52,7 @@ async function apiRequest<T>(
     if (!response.ok) {
       return {
         data: null,
-        error: data.message || 'An error occurred',
+        error: data.message || "An error occurred",
         status: response.status,
       };
     }
@@ -64,7 +65,7 @@ async function apiRequest<T>(
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error.message : 'Network error',
+      error: error instanceof Error ? error.message : "Network error",
       status: 0,
     };
   }
@@ -78,32 +79,32 @@ export const blogApi = {
   // Get all posts
   getPosts: (params?: { page?: number; limit?: number; category?: string }) => {
     const queryParams = new URLSearchParams();
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-    if (params?.category) queryParams.append('category', params.category);
-    
+    if (params?.page) queryParams.append("page", params.page.toString());
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.category) queryParams.append("category", params.category);
+
     const query = queryParams.toString();
-    return apiRequest(`/posts${query ? `?${query}` : ''}`);
+    return apiRequest(`/posts${query ? `?${query}` : ""}`);
   },
 
   // Get single post by slug
   getPostBySlug: (slug: string) => {
-    return apiRequest(`/posts/${slug}`);
+    return apiRequest(`/article/${slug}`);
   },
 
   // Get featured posts
   getFeaturedPosts: () => {
-    return apiRequest('/posts/featured');
+    return apiRequest("/articles/featured");
   },
 
   // Search posts
   searchPosts: (query: string) => {
-    return apiRequest(`/posts/search?q=${encodeURIComponent(query)}`);
+    return apiRequest(`/articles/search?q=${encodeURIComponent(query)}`);
   },
 
   //Get highlighted posts
   getHighlightedPosts: () => {
-    return apiRequest('/blogs/blogHighlights');
+    return apiRequest("/articles/blogHighlights");
   },
 };
 
@@ -114,7 +115,7 @@ export const blogApi = {
 export const categoryApi = {
   // Get all categories
   getCategories: () => {
-    return apiRequest('/categories');
+    return apiRequest("/categories");
   },
 
   // Get category by slug
@@ -123,13 +124,18 @@ export const categoryApi = {
   },
 
   // Get posts by category
-  getPostsByCategory: (categorySlug: string, params?: { page?: number; limit?: number }) => {
+  getPostsByCategory: (
+    categorySlug: string,
+    params?: { page?: number; limit?: number },
+  ) => {
     const queryParams = new URLSearchParams();
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-    
+    if (params?.page) queryParams.append("page", params.page.toString());
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+
     const query = queryParams.toString();
-    return apiRequest(`/categories/${categorySlug}/posts${query ? `?${query}` : ''}`);
+    return apiRequest(
+      `/categories/${categorySlug}/posts${query ? `?${query}` : ""}`,
+    );
   },
 };
 
@@ -163,48 +169,48 @@ export interface AuthResponse {
 export const authApi = {
   // Login
   login: (credentials: LoginCredentials) => {
-    return apiRequest<AuthResponse>('/auth/login', {
-      method: 'POST',
+    return apiRequest<AuthResponse>("/auth/login", {
+      method: "POST",
       body: JSON.stringify(credentials),
     });
   },
 
   // Sign up
   signUp: (credentials: SignUpCredentials) => {
-    return apiRequest<AuthResponse>('/auth/signup', {
-      method: 'POST',
+    return apiRequest<AuthResponse>("/auth/signup", {
+      method: "POST",
       body: JSON.stringify(credentials),
     });
   },
 
   // Logout
   logout: () => {
-    localStorage.removeItem('auth_token');
-    return apiRequest('/auth/logout', {
-      method: 'POST',
+    localStorage.removeItem("auth_token");
+    return apiRequest("/auth/logout", {
+      method: "POST",
       headers: getHeaders(true),
     });
   },
 
   // Get current user
   getCurrentUser: () => {
-    return apiRequest<AuthUser>('/auth/me', {
+    return apiRequest<AuthUser>("/auth/me", {
       headers: getHeaders(true),
     });
   },
 
   // Forgot password
   forgotPassword: (email: string) => {
-    return apiRequest('/auth/forgot-password', {
-      method: 'POST',
+    return apiRequest("/auth/forgot-password", {
+      method: "POST",
       body: JSON.stringify({ email }),
     });
   },
 
   // Reset password
   resetPassword: (token: string, password: string) => {
-    return apiRequest('/auth/reset-password', {
-      method: 'POST',
+    return apiRequest("/auth/reset-password", {
+      method: "POST",
       body: JSON.stringify({ token, password }),
     });
   },
@@ -222,16 +228,16 @@ export interface SubscriptionPayload {
 export const subscriptionApi = {
   // Subscribe to newsletter
   subscribe: (payload: SubscriptionPayload) => {
-    return apiRequest('/subscriptions', {
-      method: 'POST',
+    return apiRequest("/subscriptions", {
+      method: "POST",
       body: JSON.stringify(payload),
     });
   },
 
   // Unsubscribe
   unsubscribe: (email: string) => {
-    return apiRequest('/subscriptions/unsubscribe', {
-      method: 'POST',
+    return apiRequest("/subscriptions/unsubscribe", {
+      method: "POST",
       body: JSON.stringify({ email }),
     });
   },
@@ -244,8 +250,8 @@ export const subscriptionApi = {
 export const notificationApi = {
   // Register device for push notifications
   registerDevice: (token: string) => {
-    return apiRequest('/notifications/register', {
-      method: 'POST',
+    return apiRequest("/notifications/register", {
+      method: "POST",
       body: JSON.stringify({ token }),
       headers: getHeaders(true),
     });
@@ -253,8 +259,8 @@ export const notificationApi = {
 
   // Unregister device
   unregisterDevice: (token: string) => {
-    return apiRequest('/notifications/unregister', {
-      method: 'POST',
+    return apiRequest("/notifications/unregister", {
+      method: "POST",
       body: JSON.stringify({ token }),
       headers: getHeaders(true),
     });
@@ -262,15 +268,15 @@ export const notificationApi = {
 
   // Get notification preferences
   getPreferences: () => {
-    return apiRequest('/notifications/preferences', {
+    return apiRequest("/notifications/preferences", {
       headers: getHeaders(true),
     });
   },
 
   // Update notification preferences
   updatePreferences: (preferences: Record<string, boolean>) => {
-    return apiRequest('/notifications/preferences', {
-      method: 'PUT',
+    return apiRequest("/notifications/preferences", {
+      method: "PUT",
       body: JSON.stringify(preferences),
       headers: getHeaders(true),
     });
@@ -285,14 +291,18 @@ export interface ContactPayload {
   name: string;
   email: string;
   subject: string;
+  phone: string;
   message: string;
 }
 
 export const contactApi = {
   // Submit contact form
   submit: (payload: ContactPayload) => {
-    return apiRequest('/contact', {
-      method: 'POST',
+    return apiRequest("/public/settings/contact-us", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(payload),
     });
   },
@@ -327,8 +337,8 @@ export const commentApi = {
 
   // Create a comment
   createComment: (payload: CreateCommentPayload) => {
-    return apiRequest<Comment>('/comments', {
-      method: 'POST',
+    return apiRequest<Comment>("/comments", {
+      method: "POST",
       body: JSON.stringify(payload),
       headers: getHeaders(true),
     });
@@ -337,7 +347,7 @@ export const commentApi = {
   // Delete a comment
   deleteComment: (commentId: string) => {
     return apiRequest(`/comments/${commentId}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: getHeaders(true),
     });
   },
