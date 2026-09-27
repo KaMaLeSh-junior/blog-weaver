@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Cookie, Shield, X } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { COOKIE_CONSENT_EVENT } from "@/lib/analytics";
 
 const CookieConsent = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -26,17 +27,20 @@ const CookieConsent = () => {
   const acceptAll = () => {
     const allAccepted = { necessary: true, analytics: true, marketing: true, functional: true };
     localStorage.setItem("cookie-consent", JSON.stringify({ ...allAccepted, timestamp: Date.now() }));
+    window.dispatchEvent(new Event(COOKIE_CONSENT_EVENT));
     setIsVisible(false);
   };
 
   const rejectAll = () => {
     const onlyNecessary = { necessary: true, analytics: false, marketing: false, functional: false };
     localStorage.setItem("cookie-consent", JSON.stringify({ ...onlyNecessary, timestamp: Date.now() }));
+    window.dispatchEvent(new Event(COOKIE_CONSENT_EVENT));
     setIsVisible(false);
   };
 
   const savePreferences = () => {
     localStorage.setItem("cookie-consent", JSON.stringify({ ...preferences, timestamp: Date.now() }));
+    window.dispatchEvent(new Event(COOKIE_CONSENT_EVENT));
     setIsVisible(false);
   };
 

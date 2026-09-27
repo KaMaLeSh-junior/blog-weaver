@@ -21,6 +21,7 @@ import Sitemap from "./pages/Sitemap";
 import NotFound from "./pages/NotFound";
 import CookieConsent from "./components/CookieConsent";
 import { SettingsSync } from "@/hooks/useAppSettings";
+import { AnalyticsTracker } from "@/lib/analytics";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <AnalyticsTracker />
               <CookieConsent />
               <Routes>
                 <Route path="/" element={<Index />} />
