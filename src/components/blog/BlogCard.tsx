@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { Link } from "react-router-dom";
 import type { BlogPost } from "@/types/blog";
 import { Badge } from "@/components/ui/badge";
@@ -27,12 +28,12 @@ const ArticleMedia = ({ images, title }: { images: string[]; title: string }) =>
     </div>
   );
 
-const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
+const BlogCard = forwardRef<HTMLElement, BlogCardProps>(({ post, variant = "default" }, ref) => {
   const images = getPostImages(post);
 
   if (variant === "featured") {
     return (
-      <article className="group grid md:grid-cols-2 gap-8 bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
+      <article ref={ref} className="group grid md:grid-cols-2 gap-8 bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
         <div className="overflow-hidden h-64 md:h-80 relative">
           <ArticleMedia images={images} title={post.title} />
           <Link to={`/blog/${post.slug}`} className="absolute inset-0 z-0" />
@@ -73,7 +74,7 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
 
   if (variant === "horizontal") {
     return (
-      <article className="group flex gap-4 bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
+      <article ref={ref} className="group flex gap-4 bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
         <div className="w-1/3 min-w-[120px] overflow-hidden relative">
           <ArticleMedia images={images} title={post.title} />
           <Link to={`/blog/${post.slug}`} className="absolute inset-0 z-0" />
@@ -98,7 +99,7 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
   }
 
   return (
-    <article className="group bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
+    <article ref={ref} className="group bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
       <div className="block overflow-hidden h-48 relative">
         <ArticleMedia images={images} title={post.title} />
         <Link to={`/blog/${post.slug}`} className="absolute inset-0 z-0" />
@@ -129,6 +130,8 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
       </div>
     </article>
   );
-};
+});
+
+BlogCard.displayName = "BlogCard";
 
 export default BlogCard;
