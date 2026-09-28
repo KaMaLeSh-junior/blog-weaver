@@ -64,7 +64,7 @@ const ExploreBlogs = () => {
 
   // Flat list (for category counts)
   const { data: apiBlogs } = useAllBlogs();
-  const { data: apiCategories } = useAllCategories();
+  const { data: apiCategories, isLoading: categoriesLoading } = useAllCategories();
 
   // Server-side infinite list for the unfiltered "all" view
   const allInfinite = useAllBlogsInfinite(10, !hasFilters);
@@ -182,14 +182,13 @@ const ExploreBlogs = () => {
         <div className="container">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-1">
-              <CategoryFilter
-                activeCategory={activeCategory}
-                onCategoryChange={handleCategoryChange}
-                categories={categories}
-                selectedSubcategories={selectedSubcategories}
-                onSubcategoryToggle={handleSubcategoryToggle}
-                onClearSubcategories={() => setSelectedSubcategories([])}
-              />
+              {categoriesLoading ? (
+                <div className="flex flex-wrap gap-2">
+                  {[1, 2, 3].map((item) => <div key={item} className="h-9 w-24 animate-pulse rounded-full bg-muted" />)}
+                </div>
+              ) : (
+                <CategoryFilter activeCategory={activeCategory} onCategoryChange={handleCategoryChange} categories={categories} selectedSubcategories={selectedSubcategories} onSubcategoryToggle={handleSubcategoryToggle} onClearSubcategories={() => setSelectedSubcategories([])} />
+              )}
               <form
                 onSubmit={(e) => {
                   e.preventDefault();

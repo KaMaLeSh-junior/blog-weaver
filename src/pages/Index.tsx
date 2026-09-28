@@ -40,7 +40,7 @@ const Index = () => {
 
   const active = activeCategory === "all" ? allInfinite : categoryInfinite;
 
-  const { data: apiCategories } = useAllCategories();
+  const { data: apiCategories, isLoading: categoriesLoading } = useAllCategories();
 
   const heroPosts = useMemo(() => {
     return (apiBlogHighlights ?? [])
@@ -166,11 +166,13 @@ const Index = () => {
               Select a category to see more related content
             </p>
           </div>
-          <CategoryFilter
-            activeCategory={activeCategory}
-            onCategoryChange={setActiveCategory}
-            categories={categories}
-          />
+          {categoriesLoading ? (
+            <div className="flex flex-wrap justify-center gap-3">
+              {[1, 2, 3, 4].map((item) => <div key={item} className="h-9 w-28 animate-pulse rounded-full bg-muted" />)}
+            </div>
+          ) : (
+            <CategoryFilter activeCategory={activeCategory} onCategoryChange={setActiveCategory} categories={categories} />
+          )}
         </div>
       </motion.section>
 
