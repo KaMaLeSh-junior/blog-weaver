@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { categories as staticCategories, Category } from "@/data/blogData";
+import type { Category } from "@/types/blog";
 import { useSubcategories } from "@/hooks/useApi";
 import { Loader2, ChevronDown } from "lucide-react";
 
@@ -88,7 +88,7 @@ const CategoryFilter = ({
   onSubcategoryToggle,
   onClearSubcategories,
 }: CategoryFilterProps) => {
-  const cats = categories || staticCategories;
+  const cats = categories ?? [];
 
   return (
     <div className="flex flex-wrap justify-center gap-3">

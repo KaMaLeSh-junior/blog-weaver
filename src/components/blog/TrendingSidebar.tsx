@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BlogPost } from "@/data/blogData";
+import type { BlogPost } from "@/types/blog";
 import { TrendingUp, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 

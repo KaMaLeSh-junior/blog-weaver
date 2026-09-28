@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SortOption } from "@/data/blogData";
+import type { SortOption } from "@/types/blog";
 import { ArrowDownAZ, TrendingUp, Eye, Clock } from "lucide-react";
 
 interface SortFilterProps {

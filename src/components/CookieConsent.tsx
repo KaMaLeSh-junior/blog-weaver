@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Cookie, Shield, X } from "lucide-react";
+import { Cookie, Shield } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   COOKIE_CONSENT_EVENT,
@@ -40,9 +40,6 @@ const CookieConsent = () => {
     window.dispatchEvent(new Event(COOKIE_CONSENT_EVENT));
     setIsVisible(false);
   };
-  function callInitializtaion() {
-    initializeGoogleAnalytics();
-  }
   const rejectAll = () => {
     const onlyNecessary = {
       necessary: true,
@@ -70,8 +67,13 @@ const CookieConsent = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[100] p-4 lg:p-6">
-      <div className="max-w-2xl mx-auto bg-card border border-border rounded-2xl shadow-lg overflow-hidden">
+    <div
+      className="fixed inset-0 z-[200] flex items-end justify-center bg-foreground/70 p-4 backdrop-blur-sm lg:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cookie-consent-title"
+    >
+      <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-primary/40 bg-card shadow-xl ring-2 ring-primary/30">
         {/* Main banner */}
         <div className="p-5">
           <div className="flex items-start gap-3">
@@ -79,7 +81,7 @@ const CookieConsent = () => {
               <Cookie className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-heading font-semibold text-foreground text-base mb-1">
+              <h3 id="cookie-consent-title" className="font-heading font-semibold text-foreground text-base mb-1">
                 {t.cookies?.title || "We value your privacy"}
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
@@ -87,13 +89,6 @@ const CookieConsent = () => {
                   'We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.'}
               </p>
             </div>
-            <button
-              onClick={rejectAll}
-              className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
-              aria-label="Close"
-            >
-              <X className="h-4 w-4" />
-            </button>
           </div>
 
           {/* Preferences panel */}

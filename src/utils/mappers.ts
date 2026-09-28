@@ -1,5 +1,5 @@
 import type { ApiBlogPost, ApiCategory } from "@/types/api";
-import type { BlogPost, Category } from "@/data/blogData";
+import type { BlogPost, Category, SortOption } from "@/types/blog";
 import { getImageUrl } from "@/config/api";
 
 // Default author when API doesn't provide one
@@ -19,9 +19,7 @@ export const mapApiBlogToPost = (api: ApiBlogPost): BlogPost => ({
   title: api.title,
   excerpt: api.small_description,
   content: api.large_description,
-  image: api.images?.[0]
-    ? getImageUrl(api.images[0].image_name)
-    : "/placeholder.svg",
+  image: api.images?.[0] ? getImageUrl(api.images[0].image_name) : undefined,
   images: api.images?.length
     ? api.images.map((img) => getImageUrl(img.image_name))
     : undefined,
@@ -52,7 +50,7 @@ export const mapApiCategoryToCategory = (
 /**
  * Sort mapped BlogPosts (mirrors getSortedPosts from blogData)
  */
-export type SortOption = "latest" | "oldest" | "trending" | "most-viewed";
+export type { SortOption };
 
 export const getSortedApiPosts = (posts: BlogPost[], sortBy: SortOption): BlogPost[] => {
   switch (sortBy) {
