@@ -2,14 +2,6 @@ import type { ApiBlogPost, ApiCategory } from "@/types/api";
 import type { BlogPost, Category, SortOption } from "@/types/blog";
 import { getImageUrl } from "@/config/api";
 
-// Default author when API doesn't provide one
-const defaultAuthor = {
-  id: "api",
-  name: "Editorial Team",
-  avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Editorial",
-  bio: "Our editorial team covers a wide range of topics.",
-};
-
 /**
  * Convert an API blog post to the frontend BlogPost format.
  */
@@ -25,7 +17,7 @@ export const mapApiBlogToPost = (api: ApiBlogPost): BlogPost => ({
     : undefined,
   category: api.category?.name || "Uncategorized",
   subcategory: api.subcategory?.name,
-  author: defaultAuthor,
+  author: undefined,
   publishedAt: api.created_date,
   readTime: Math.max(1, Math.ceil(api.large_description.replace(/<[^>]+>/g, "").split(/\s+/).length / 200)),
   featured: false,

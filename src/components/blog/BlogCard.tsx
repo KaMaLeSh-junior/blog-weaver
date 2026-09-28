@@ -54,18 +54,16 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
           <p className="text-muted-foreground cursor-pointer mb-6 line-clamp-2">
             {post.excerpt}
           </p>
-          <div className="flex cursor-pointer items-center gap-3">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={post.author.avatar} alt={post.author.name} />
-              <AvatarFallback>{post.author.name[0]}</AvatarFallback>
-            </Avatar>
-            <div className="text-sm">
-              <p className="font-medium text-foreground text-primary transition-colors">
-                {post.author.name}
-              </p>
-              <p className="text-muted-foreground">
-                {formatDate(post.publishedAt)}
-              </p>
+          <div className="flex cursor-pointer items-center gap-3 text-sm">
+            {post.author && (
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={post.author.avatar} alt={post.author.name} />
+                <AvatarFallback>{post.author.name[0]}</AvatarFallback>
+              </Avatar>
+            )}
+            <div>
+              {post.author && <p className="font-medium text-primary">{post.author.name}</p>}
+              <p className="text-muted-foreground">{formatDate(post.publishedAt)}</p>
             </div>
           </div>
         </div>
@@ -92,7 +90,7 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
             </h3>
           </Link>
           <p className="text-sm text-muted-foreground">
-            {post.author.name} • {formatDate(post.publishedAt)}
+            {post.author ? `${post.author.name} • ` : ""}{formatDate(post.publishedAt)}
           </p>
         </div>
       </article>
@@ -123,11 +121,7 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
           {post.excerpt}
         </p>
         <div className="flex cursor-pointer items-center gap-2 text-sm">
-          <span className="text-muted-foreground">By</span>
-          <p className="font-medium text-foreground text-primary transition-colors">
-            {post.author.name}
-          </p>
-          <span className="text-muted-foreground">•</span>
+          {post.author && <><span className="text-muted-foreground">By</span><p className="font-medium text-primary">{post.author.name}</p><span className="text-muted-foreground">•</span></>}
           <span className="text-muted-foreground">
             {formatDate(post.publishedAt)}
           </span>

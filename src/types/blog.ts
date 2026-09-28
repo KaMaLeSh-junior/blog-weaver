@@ -15,7 +15,7 @@ export interface BlogPost {
   images?: string[];
   category: string;
   subcategory?: string;
-  author: Author;
+  author?: Author;
   publishedAt: string;
   readTime: number;
   featured?: boolean;
