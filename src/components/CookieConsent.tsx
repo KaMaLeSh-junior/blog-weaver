@@ -4,7 +4,6 @@ import { Cookie, Shield } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   COOKIE_CONSENT_EVENT,
-  initializeGoogleAnalytics,
 } from "@/lib/analytics";
 
 const CookieConsent = () => {

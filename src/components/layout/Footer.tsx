@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { categories as staticCategories } from "@/data/blogData";
 import { useAppSettings, getEnabledSocialLinks } from "@/hooks/useAppSettings";
 import { getImageUrl } from "@/config/api";
 import type { SocialPlatform } from "@/types/api";
@@ -33,14 +32,11 @@ const Footer = () => {
   const title = settings.title || "ClarityMFG";
   const initial = title.trim().charAt(0).toUpperCase() || "C";
   const logoSrc = settings.logo_image ? getImageUrl(settings.logo_image) : null;
-  const { data: apiCategories } = useAllCategories();
+  const { data: apiCategories, isLoading: categoriesLoading } = useAllCategories();
   const categories = useMemo(() => {
-    if (apiCategories && apiCategories.length > 0) {
-      return apiCategories
-        .filter((c) => c.status === 1)
-        .map((c) => mapApiCategoryToCategory(c, 0));
-    }
-    return staticCategories;
+    return (apiCategories ?? [])
+      .filter((c) => c.status === 1)
+      .map((c) => mapApiCategoryToCategory(c, 0));
   }, [apiCategories]);
   return (
     <footer className="bg-foreground text-primary-foreground dark:bg-card dark:text-card-foreground">
@@ -123,6 +119,12 @@ const Footer = () => {
               Categories
             </h4>
             <ul className="space-y-3">
+              {categoriesLoading && (
+                <li className="text-sm text-primary-foreground/70">Loading categories...</li>
+              )}
+              {!categoriesLoading && categories.length === 0 && (
+                <li className="text-sm text-primary-foreground/70">No categories available</li>
+              )}
               {categories.map((category) => (
                 <li key={category.id}>
                   <Link
