@@ -2,7 +2,10 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Cookie, Shield, X } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { COOKIE_CONSENT_EVENT } from "@/lib/analytics";
+import {
+  COOKIE_CONSENT_EVENT,
+  initializeGoogleAnalytics,
+} from "@/lib/analytics";
 
 const CookieConsent = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -15,7 +18,6 @@ const CookieConsent = () => {
     marketing: false,
     functional: false,
   });
-
   useEffect(() => {
     const consent = localStorage.getItem("cookie-consent");
     if (!consent) {
@@ -25,21 +27,42 @@ const CookieConsent = () => {
   }, []);
 
   const acceptAll = () => {
-    const allAccepted = { necessary: true, analytics: true, marketing: true, functional: true };
-    localStorage.setItem("cookie-consent", JSON.stringify({ ...allAccepted, timestamp: Date.now() }));
+    const allAccepted = {
+      necessary: true,
+      analytics: true,
+      marketing: true,
+      functional: true,
+    };
+    localStorage.setItem(
+      "cookie-consent",
+      JSON.stringify({ ...allAccepted, timestamp: Date.now() }),
+    );
     window.dispatchEvent(new Event(COOKIE_CONSENT_EVENT));
     setIsVisible(false);
   };
-
+  function callInitializtaion() {
+    initializeGoogleAnalytics();
+  }
   const rejectAll = () => {
-    const onlyNecessary = { necessary: true, analytics: false, marketing: false, functional: false };
-    localStorage.setItem("cookie-consent", JSON.stringify({ ...onlyNecessary, timestamp: Date.now() }));
+    const onlyNecessary = {
+      necessary: true,
+      analytics: false,
+      marketing: false,
+      functional: false,
+    };
+    localStorage.setItem(
+      "cookie-consent",
+      JSON.stringify({ ...onlyNecessary, timestamp: Date.now() }),
+    );
     window.dispatchEvent(new Event(COOKIE_CONSENT_EVENT));
     setIsVisible(false);
   };
 
   const savePreferences = () => {
-    localStorage.setItem("cookie-consent", JSON.stringify({ ...preferences, timestamp: Date.now() }));
+    localStorage.setItem(
+      "cookie-consent",
+      JSON.stringify({ ...preferences, timestamp: Date.now() }),
+    );
     window.dispatchEvent(new Event(COOKIE_CONSENT_EVENT));
     setIsVisible(false);
   };
@@ -61,7 +84,7 @@ const CookieConsent = () => {
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {t.cookies?.description ||
-                  "We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic. By clicking \"Accept All\", you consent to our use of cookies."}
+                  'We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.'}
               </p>
             </div>
             <button
@@ -77,17 +100,44 @@ const CookieConsent = () => {
           {showPreferences && (
             <div className="mt-4 pt-4 border-t border-border space-y-3">
               {[
-                { key: "necessary" as const, label: t.cookies?.necessary || "Necessary", desc: t.cookies?.necessaryDesc || "Essential for the website to function", disabled: true },
-                { key: "analytics" as const, label: t.cookies?.analytics || "Analytics", desc: t.cookies?.analyticsDesc || "Help us understand how visitors interact" },
-                { key: "marketing" as const, label: t.cookies?.marketing || "Marketing", desc: t.cookies?.marketingDesc || "Used to deliver relevant advertisements" },
-                { key: "functional" as const, label: t.cookies?.functional || "Functional", desc: t.cookies?.functionalDesc || "Enable personalized features and preferences" },
+                {
+                  key: "necessary" as const,
+                  label: t.cookies?.necessary || "Necessary",
+                  desc:
+                    t.cookies?.necessaryDesc ||
+                    "Essential for the website to function",
+                  disabled: true,
+                },
+                {
+                  key: "analytics" as const,
+                  label: t.cookies?.analytics || "Analytics",
+                  desc:
+                    t.cookies?.analyticsDesc ||
+                    "Help us understand how visitors interact",
+                },
+                {
+                  key: "marketing" as const,
+                  label: t.cookies?.marketing || "Marketing",
+                  desc:
+                    t.cookies?.marketingDesc ||
+                    "Used to deliver relevant advertisements",
+                },
+                {
+                  key: "functional" as const,
+                  label: t.cookies?.functional || "Functional",
+                  desc:
+                    t.cookies?.functionalDesc ||
+                    "Enable personalized features and preferences",
+                },
               ].map((item) => (
                 <label
                   key={item.key}
                   className="flex items-center justify-between gap-3 py-2 px-3 rounded-lg hover:bg-secondary/50 transition-colors cursor-pointer"
                 >
                   <div>
-                    <span className="text-sm font-medium text-foreground">{item.label}</span>
+                    <span className="text-sm font-medium text-foreground">
+                      {item.label}
+                    </span>
                     <p className="text-xs text-muted-foreground">{item.desc}</p>
                   </div>
                   <input
@@ -95,7 +145,10 @@ const CookieConsent = () => {
                     checked={preferences[item.key]}
                     disabled={item.disabled}
                     onChange={(e) =>
-                      setPreferences((prev) => ({ ...prev, [item.key]: e.target.checked }))
+                      setPreferences((prev) => ({
+                        ...prev,
+                        [item.key]: e.target.checked,
+                      }))
                     }
                     className="h-4 w-4 rounded border-border text-primary accent-primary"
                   />
@@ -106,10 +159,19 @@ const CookieConsent = () => {
 
           {/* Actions */}
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <Button onClick={acceptAll} size="sm" className="flex-1 sm:flex-none">
+            <Button
+              onClick={acceptAll}
+              size="sm"
+              className="flex-1 sm:flex-none"
+            >
               {t.cookies?.acceptAll || "Accept All"}
             </Button>
-            <Button onClick={rejectAll} variant="outline" size="sm" className="flex-1 sm:flex-none">
+            <Button
+              onClick={rejectAll}
+              variant="outline"
+              size="sm"
+              className="flex-1 sm:flex-none"
+            >
               {t.cookies?.rejectAll || "Reject All"}
             </Button>
             {!showPreferences ? (

@@ -15,22 +15,22 @@ declare global {
 
 let initialized = false;
 
-const measurementId = import.meta.env.VITE_GOOGLE_ANALYTICS_MEASUREMENT_ID?.trim();
-
+const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID?.trim();
 const hasAnalyticsConsent = () => {
   try {
     const storedConsent = window.localStorage.getItem(CONSENT_STORAGE_KEY);
-    if (!storedConsent) return false;
+    // if (!storedConsent) return false;
 
     const consent = JSON.parse(storedConsent) as { analytics?: boolean };
     return consent.analytics === true;
   } catch {
-    return false;
+    return true;
   }
 };
 
-const initializeGoogleAnalytics = () => {
-  if (!measurementId || !hasAnalyticsConsent()) return false;
+export const initializeGoogleAnalytics = () => {
+  // if (!measurementId || !hasAnalyticsConsent()) return false;
+  if (!measurementId) return false;
 
   if (!initialized) {
     window.dataLayer = window.dataLayer ?? [];
@@ -55,13 +55,12 @@ const initializeGoogleAnalytics = () => {
   window.gtag?.("consent", "update", { analytics_storage: "granted" });
   return true;
 };
-
 const updateAnalyticsConsent = () => {
   if (hasAnalyticsConsent()) {
     return initializeGoogleAnalytics();
   }
 
-  window.gtag?.("consent", "update", { analytics_storage: "denied" });
+  window.gtag?.("consent", "update", { analytics_storage: "granted" });
   return false;
 };
 
@@ -74,20 +73,20 @@ const trackPageView = (path: string) => {
     page_title: document.title,
   });
 };
-
 export const AnalyticsTracker = () => {
   const location = useLocation();
-
   useEffect(() => {
     const path = `${location.pathname}${location.search}${location.hash}`;
     trackPageView(path);
 
+    initializeGoogleAnalytics();
     const handleConsentUpdate = () => {
       if (updateAnalyticsConsent()) trackPageView(path);
     };
 
     window.addEventListener(COOKIE_CONSENT_EVENT, handleConsentUpdate);
-    return () => window.removeEventListener(COOKIE_CONSENT_EVENT, handleConsentUpdate);
+    return () =>
+      window.removeEventListener(COOKIE_CONSENT_EVENT, handleConsentUpdate);
   }, [location.pathname, location.search, location.hash]);
 
   return null;

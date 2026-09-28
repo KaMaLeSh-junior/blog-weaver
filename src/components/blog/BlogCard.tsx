@@ -30,7 +30,10 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
         </div>
         <div className="flex flex-col justify-center p-6 md:p-8 md:pr-12">
           <Link to={`/category/${post.category.toLowerCase()}`}>
-            <Badge variant="secondary" className="w-fit mb-4 hover:bg-primary hover:text-primary-foreground transition-colors">
+            <Badge
+              variant="secondary"
+              className="w-fit mb-4 hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
               {post.category}
             </Badge>
           </Link>
@@ -39,17 +42,21 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
               {post.title}
             </h2>
           </Link>
-          <p className="text-muted-foreground mb-6 line-clamp-2">{post.excerpt}</p>
-          <div className="flex items-center gap-3">
+          <p className="text-muted-foreground cursor-pointer mb-6 line-clamp-2">
+            {post.excerpt}
+          </p>
+          <div className="flex cursor-pointer items-center gap-3">
             <Avatar className="h-10 w-10">
               <AvatarImage src={post.author.avatar} alt={post.author.name} />
               <AvatarFallback>{post.author.name[0]}</AvatarFallback>
             </Avatar>
             <div className="text-sm">
-              <Link to={`/author/${post.author.id}`} className="font-medium text-foreground hover:text-primary transition-colors">
+              <p className="font-medium text-foreground text-primary transition-colors">
                 {post.author.name}
-              </Link>
-              <p className="text-muted-foreground">{formatDate(post.publishedAt)}</p>
+              </p>
+              <p className="text-muted-foreground">
+                {formatDate(post.publishedAt)}
+              </p>
             </div>
           </div>
         </div>
@@ -91,7 +98,10 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
       </div>
       <div className="p-5">
         <Link to={`/category/${post.category.toLowerCase()}`}>
-          <Badge variant="secondary" className="mb-3 hover:bg-primary hover:text-primary-foreground transition-colors">
+          <Badge
+            variant="secondary"
+            className="mb-3 hover:bg-primary hover:text-primary-foreground transition-colors"
+          >
             {post.category}
           </Badge>
         </Link>
@@ -100,14 +110,18 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
             {post.title}
           </h3>
         </Link>
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{post.excerpt}</p>
-        <div className="flex items-center gap-2 text-sm">
+        <p className="text-sm text-muted-foreground cursor-pointer line-clamp-2 mb-4">
+          {post.excerpt}
+        </p>
+        <div className="flex cursor-pointer items-center gap-2 text-sm">
           <span className="text-muted-foreground">By</span>
-          <Link to={`/author/${post.author.id}`} className="font-medium text-foreground hover:text-primary transition-colors">
+          <p className="font-medium text-foreground text-primary transition-colors">
             {post.author.name}
-          </Link>
+          </p>
           <span className="text-muted-foreground">•</span>
-          <span className="text-muted-foreground">{formatDate(post.publishedAt)}</span>
+          <span className="text-muted-foreground">
+            {formatDate(post.publishedAt)}
+          </span>
         </div>
       </div>
     </article>

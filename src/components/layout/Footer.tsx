@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useMemo } from "react";
 import {
   Facebook,
   Twitter,
@@ -10,10 +11,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { categories } from "@/data/blogData";
+import { categories as staticCategories } from "@/data/blogData";
 import { useAppSettings, getEnabledSocialLinks } from "@/hooks/useAppSettings";
 import { getImageUrl } from "@/config/api";
 import type { SocialPlatform } from "@/types/api";
+import { useAllCategories } from "@/hooks/useApi";
+import { mapApiCategoryToCategory } from "@/utils/mappers";
 
 const ICONS: Record<SocialPlatform, typeof Facebook> = {
   facebook: Facebook,
@@ -30,7 +33,15 @@ const Footer = () => {
   const title = settings.title || "ClarityMFG";
   const initial = title.trim().charAt(0).toUpperCase() || "C";
   const logoSrc = settings.logo_image ? getImageUrl(settings.logo_image) : null;
-
+  const { data: apiCategories } = useAllCategories();
+  const categories = useMemo(() => {
+    if (apiCategories && apiCategories.length > 0) {
+      return apiCategories
+        .filter((c) => c.status === 1)
+        .map((c) => mapApiCategoryToCategory(c, 0));
+    }
+    return staticCategories;
+  }, [apiCategories]);
   return (
     <footer className="bg-foreground text-primary-foreground dark:bg-card dark:text-card-foreground">
       {/* Newsletter Section */}
@@ -42,7 +53,8 @@ const Footer = () => {
                 Subscribe to Our Newsletter
               </h3>
               <p className="text-primary-foreground/70 mb-6">
-                Get the latest articles, insights, and updates delivered straight to your inbox.
+                Get the latest articles, insights, and updates delivered
+                straight to your inbox.
               </p>
               <form className="flex gap-3 max-w-md mx-auto">
                 <Input
@@ -68,7 +80,11 @@ const Footer = () => {
             <Link to="/" className="flex items-center gap-2 mb-6">
               <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center overflow-hidden">
                 {logoSrc ? (
-                  <img src={logoSrc} alt={title} className="w-full h-full object-cover" />
+                  <img
+                    src={logoSrc}
+                    alt={title}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <span className="text-primary-foreground font-heading font-bold text-lg">
                     {initial}
@@ -103,7 +119,9 @@ const Footer = () => {
 
           {/* Categories */}
           <div>
-            <h4 className="font-heading font-semibold text-lg mb-6">Categories</h4>
+            <h4 className="font-heading font-semibold text-lg mb-6">
+              Categories
+            </h4>
             <ul className="space-y-3">
               {categories.map((category) => (
                 <li key={category.id}>
@@ -120,25 +138,39 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-heading font-semibold text-lg mb-6">Quick Links</h4>
+            <h4 className="font-heading font-semibold text-lg mb-6">
+              Quick Links
+            </h4>
             <ul className="space-y-3">
               <li>
-                <Link to="/about" className="text-primary-foreground/70 hover:text-primary transition-colors text-sm">
+                <Link
+                  to="/about"
+                  className="text-primary-foreground/70 hover:text-primary transition-colors text-sm"
+                >
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-primary-foreground/70 hover:text-primary transition-colors text-sm">
+                <Link
+                  to="/contact"
+                  className="text-primary-foreground/70 hover:text-primary transition-colors text-sm"
+                >
                   Contact
                 </Link>
               </li>
               <li>
-                <Link to="/privacy-policy" className="text-primary-foreground/70 hover:text-primary transition-colors text-sm">
+                <Link
+                  to="/privacy-policy"
+                  className="text-primary-foreground/70 hover:text-primary transition-colors text-sm"
+                >
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to="/sitemap" className="text-primary-foreground/70 hover:text-primary transition-colors text-sm">
+                <Link
+                  to="/sitemap"
+                  className="text-primary-foreground/70 hover:text-primary transition-colors text-sm"
+                >
                   Sitemap
                 </Link>
               </li>
@@ -147,19 +179,27 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h4 className="font-heading font-semibold text-lg mb-6">Contact Us</h4>
+            <h4 className="font-heading font-semibold text-lg mb-6">
+              Contact Us
+            </h4>
             <ul className="space-y-3 text-sm text-primary-foreground/70">
               {settings.address && <li>{settings.address}</li>}
               {settings.email && (
                 <li>
-                  <a href={`mailto:${settings.email}`} className="hover:text-primary transition-colors">
+                  <a
+                    href={`mailto:${settings.email}`}
+                    className="hover:text-primary transition-colors"
+                  >
                     {settings.email}
                   </a>
                 </li>
               )}
               {settings.phone && (
                 <li>
-                  <a href={`tel:${settings.phone}`} className="hover:text-primary transition-colors">
+                  <a
+                    href={`tel:${settings.phone}`}
+                    className="hover:text-primary transition-colors"
+                  >
                     {settings.phone}
                   </a>
                 </li>
@@ -173,15 +213,37 @@ const Footer = () => {
       <div className="border-t border-primary-foreground/10">
         <div className="container py-6">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-primary-foreground/60">
-            <p>&copy; {new Date().getFullYear()} {title}. All rights reserved.</p>
+            <p>
+              &copy; {new Date().getFullYear()} {title}. All rights reserved.
+            </p>
+            <p>
+              Made by{" "}
+              <a
+                target="_blank"
+                href="https://digitalworkhouse.claritymfg.com/"
+                style={{ color: "red" }}
+              >
+                DigitalWorkHouse
+              </a>
+              .
+            </p>
             <div className="flex gap-6">
-              <Link to="/privacy-policy" className="hover:text-primary transition-colors">
+              <Link
+                to="/privacy-policy"
+                className="hover:text-primary transition-colors"
+              >
                 Privacy
               </Link>
-              <Link to="/terms" className="hover:text-primary transition-colors">
+              <Link
+                to="/terms"
+                className="hover:text-primary transition-colors"
+              >
                 Terms
               </Link>
-              <Link to="/sitemap" className="hover:text-primary transition-colors">
+              <Link
+                to="/sitemap"
+                className="hover:text-primary transition-colors"
+              >
                 Sitemap
               </Link>
             </div>
