@@ -1,14 +1,6 @@
 import type { ApiBlogPost, ApiCategory } from "@/types/api";
-import type { BlogPost, Category } from "@/data/blogData";
+import type { BlogPost, Category, SortOption } from "@/types/blog";
 import { getImageUrl } from "@/config/api";
-
-// Default author when API doesn't provide one
-const defaultAuthor = {
-  id: "api",
-  name: "Editorial Team",
-  avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Editorial",
-  bio: "Our editorial team covers a wide range of topics.",
-};
 
 /**
  * Convert an API blog post to the frontend BlogPost format.
@@ -19,15 +11,13 @@ export const mapApiBlogToPost = (api: ApiBlogPost): BlogPost => ({
   title: api.title,
   excerpt: api.small_description,
   content: api.large_description,
-  image: api.images?.[0]
-    ? getImageUrl(api.images[0].image_name)
-    : "/placeholder.svg",
+  image: api.images?.[0] ? getImageUrl(api.images[0].image_name) : undefined,
   images: api.images?.length
     ? api.images.map((img) => getImageUrl(img.image_name))
     : undefined,
   category: api.category?.name || "Uncategorized",
   subcategory: api.subcategory?.name,
-  author: defaultAuthor,
+  author: undefined,
   publishedAt: api.created_date,
   readTime: Math.max(1, Math.ceil(api.large_description.replace(/<[^>]+>/g, "").split(/\s+/).length / 200)),
   featured: false,
@@ -52,7 +42,7 @@ export const mapApiCategoryToCategory = (
 /**
  * Sort mapped BlogPosts (mirrors getSortedPosts from blogData)
  */
-export type SortOption = "latest" | "oldest" | "trending" | "most-viewed";
+export type { SortOption };
 
 export const getSortedApiPosts = (posts: BlogPost[], sortBy: SortOption): BlogPost[] => {
   switch (sortBy) {

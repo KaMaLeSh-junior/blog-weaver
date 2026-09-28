@@ -10,11 +10,6 @@ import {
   useFilteredSearchInfinite,
 } from "@/hooks/useApi";
 import { mapApiBlogToPost, mapApiCategoryToCategory } from "@/utils/mappers";
-import {
-  blogPosts as staticPosts,
-  getFeaturedPosts,
-  categories as staticCategories,
-} from "@/data/blogData";
 import { Loader2 } from "lucide-react";
 import {
   Carousel,
@@ -32,7 +27,7 @@ const Index = () => {
   const newsletterRef = useRef<HTMLDivElement>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
 
-  const { data: apiBlogHighlights, isLoading: highlightsLoading } =
+  const { data: apiBlogHighlights, isLoading: highlightsLoading, isError: highlightsError } =
     useBlogHighlights();
 
   // Infinite list when no category is selected
@@ -45,13 +40,12 @@ const Index = () => {
 
   const active = activeCategory === "all" ? allInfinite : categoryInfinite;
 
-  const { data: apiCategories } = useAllCategories();
+  const { data: apiCategories, isLoading: categoriesLoading } = useAllCategories();
 
   const heroPosts = useMemo(() => {
-    if (apiBlogHighlights && apiBlogHighlights.length > 0) {
-      return apiBlogHighlights.filter((b) => b.status === 1).map(mapApiBlogToPost);
-    }
-    return staticPosts;
+    return (apiBlogHighlights ?? [])
+      .filter((b) => b.status === 1)
+      .map(mapApiBlogToPost);
   }, [apiBlogHighlights]);
 
   const gridPosts = useMemo(() => {
@@ -60,23 +54,19 @@ const Index = () => {
         .flatMap((p) => p.data)
         .filter((b) => b.status === 1)
         .map(mapApiBlogToPost);
-      if (flat.length > 0) return flat;
+      return flat;
     }
-    return activeCategory === "all" ? staticPosts : [];
-  }, [active.data, activeCategory]);
+    return [];
+  }, [active.data]);
 
   const categories = useMemo(() => {
-    if (apiCategories && apiCategories.length > 0) {
-      return apiCategories
-        .filter((c) => c.status === 1)
-        .map((c) => mapApiCategoryToCategory(c, 0));
-    }
-    return staticCategories;
+    return (apiCategories ?? [])
+      .filter((c) => c.status === 1)
+      .map((c) => mapApiCategoryToCategory(c, 0));
   }, [apiCategories]);
 
   const featuredPosts = useMemo(() => {
-    if (heroPosts.length > 0) return heroPosts.slice(0, 4);
-    return getFeaturedPosts(4);
+    return heroPosts.slice(0, 4);
   }, [heroPosts]);
 
   const blogsLoading = active.isLoading;
@@ -127,6 +117,8 @@ const Index = () => {
         <div className="container">
           {highlightsLoading ? (
             <SkeletonCard variant="featured" />
+          ) : highlightsError ? (
+            <p className="py-16 text-center text-muted-foreground">Featured articles are unavailable right now.</p>
           ) : useCarousel && featuredPosts.length > 1 ? (
             <Carousel opts={{ align: "start", loop: true }} className="w-full">
               <CarouselContent>
@@ -141,8 +133,10 @@ const Index = () => {
                 <CarouselNext className="static translate-y-0 bg-card hover:bg-accent" />
               </div>
             </Carousel>
+          ) : featuredPosts[0] ? (
+            <BlogCard post={featuredPosts[0]} variant="featured" />
           ) : (
-            featuredPosts[0] && <BlogCard post={featuredPosts[0]} variant="featured" />
+            <p className="py-16 text-center text-muted-foreground">No featured articles are available yet.</p>
           )}
         </div>
       </motion.section>
@@ -172,11 +166,13 @@ const Index = () => {
               Select a category to see more related content
             </p>
           </div>
-          <CategoryFilter
-            activeCategory={activeCategory}
-            onCategoryChange={setActiveCategory}
-            categories={categories}
-          />
+          {categoriesLoading ? (
+            <div className="flex flex-wrap justify-center gap-3">
+              {[1, 2, 3, 4].map((item) => <div key={item} className="h-9 w-28 animate-pulse rounded-full bg-muted" />)}
+            </div>
+          ) : (
+            <CategoryFilter activeCategory={activeCategory} onCategoryChange={setActiveCategory} categories={categories} />
+          )}
         </div>
       </motion.section>
 
@@ -188,6 +184,10 @@ const Index = () => {
                 <SkeletonCard key={i} />
               ))}
             </div>
+          ) : active.isError ? (
+            <p className="py-16 text-center text-muted-foreground">Articles could not be loaded. Please try again later.</p>
+          ) : gridPosts.length === 0 ? (
+            <p className="py-16 text-center text-muted-foreground">No articles are available yet.</p>
           ) : (
             <>
               <motion.div

@@ -18,11 +18,6 @@ import {
   getSortedApiPosts,
   SortOption,
 } from "@/utils/mappers";
-import {
-  blogPosts as staticPosts,
-  categories as staticCategories,
-  getSortedPosts,
-} from "@/data/blogData";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { SkeletonCard } from "@/components/ui/skeleton-card";
@@ -69,7 +64,7 @@ const ExploreBlogs = () => {
 
   // Flat list (for category counts)
   const { data: apiBlogs } = useAllBlogs();
-  const { data: apiCategories } = useAllCategories();
+  const { data: apiCategories, isLoading: categoriesLoading } = useAllCategories();
 
   // Server-side infinite list for the unfiltered "all" view
   const allInfinite = useAllBlogsInfinite(10, !hasFilters);
@@ -97,24 +92,18 @@ const ExploreBlogs = () => {
   const activeTotal = active.data?.pages[0]?.pagination.total ?? activePosts.length;
 
   const allPosts = useMemo(() => {
-    if (apiBlogs && apiBlogs.length > 0) {
-      return apiBlogs.filter((b) => b.status === 1).map(mapApiBlogToPost);
-    }
-    return staticPosts;
+    return (apiBlogs ?? []).filter((b) => b.status === 1).map(mapApiBlogToPost);
   }, [apiBlogs]);
 
   const categories = useMemo(() => {
-    if (apiCategories && apiCategories.length > 0) {
-      return apiCategories
-        .filter((c) => c.status === 1)
-        .map((c) => {
-          const count = allPosts.filter(
-            (p) => p.category.toLowerCase() === c.name.toLowerCase(),
-          ).length;
-          return mapApiCategoryToCategory(c, count);
-        });
-    }
-    return staticCategories;
+    return (apiCategories ?? [])
+      .filter((c) => c.status === 1)
+      .map((c) => {
+        const count = allPosts.filter(
+          (p) => p.category.toLowerCase() === c.name.toLowerCase(),
+        ).length;
+        return mapApiCategoryToCategory(c, count);
+      });
   }, [apiCategories, allPosts]);
 
   const handleCategoryChange = (slug: string) => {
@@ -144,11 +133,8 @@ const ExploreBlogs = () => {
 
   // Sort the active list (works for both filtered + unfiltered server pages)
   const sortedPosts = useMemo(
-    () =>
-      apiBlogs && apiBlogs.length > 0
-        ? getSortedApiPosts(activePosts, sortBy)
-        : getSortedPosts(activePosts, sortBy),
-    [activePosts, sortBy, apiBlogs],
+    () => getSortedApiPosts(activePosts, sortBy),
+    [activePosts, sortBy],
   );
 
   // Single shared infinite-scroll observer for both filtered + unfiltered
@@ -196,14 +182,13 @@ const ExploreBlogs = () => {
         <div className="container">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-1">
-              <CategoryFilter
-                activeCategory={activeCategory}
-                onCategoryChange={handleCategoryChange}
-                categories={categories}
-                selectedSubcategories={selectedSubcategories}
-                onSubcategoryToggle={handleSubcategoryToggle}
-                onClearSubcategories={() => setSelectedSubcategories([])}
-              />
+              {categoriesLoading ? (
+                <div className="flex flex-wrap gap-2">
+                  {[1, 2, 3].map((item) => <div key={item} className="h-9 w-24 animate-pulse rounded-full bg-muted" />)}
+                </div>
+              ) : (
+                <CategoryFilter activeCategory={activeCategory} onCategoryChange={handleCategoryChange} categories={categories} selectedSubcategories={selectedSubcategories} onSubcategoryToggle={handleSubcategoryToggle} onClearSubcategories={() => setSelectedSubcategories([])} />
+              )}
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -280,6 +265,8 @@ const ExploreBlogs = () => {
                 <SkeletonCard key={i} />
               ))}
             </div>
+          ) : active.isError ? (
+            <p className="py-16 text-center text-muted-foreground">Articles could not be loaded. Please try again later.</p>
           ) : (
             <div className="grid lg:grid-cols-4 gap-8">
               <div className="lg:col-span-3">

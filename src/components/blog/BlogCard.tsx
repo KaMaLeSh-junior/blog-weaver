@@ -1,5 +1,6 @@
+import { forwardRef } from "react";
 import { Link } from "react-router-dom";
-import { BlogPost } from "@/data/blogData";
+import type { BlogPost } from "@/types/blog";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/utils";
@@ -15,17 +16,26 @@ const getPostImages = (post: BlogPost): string[] => {
   if (post.images && post.images.length > 0) {
     return post.images;
   }
-  return [post.image];
+  return post.image ? [post.image] : [];
 };
 
-const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
+const ArticleMedia = ({ images, title }: { images: string[]; title: string }) =>
+  images.length > 0 ? (
+    <ImageCarousel images={images} alt={title} />
+  ) : (
+    <div className="flex h-full w-full items-center justify-center bg-muted text-sm text-muted-foreground">
+      Image unavailable
+    </div>
+  );
+
+const BlogCard = forwardRef<HTMLElement, BlogCardProps>(({ post, variant = "default" }, ref) => {
   const images = getPostImages(post);
 
   if (variant === "featured") {
     return (
-      <article className="group grid md:grid-cols-2 gap-8 bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
+      <article ref={ref} className="group grid md:grid-cols-2 gap-8 bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
         <div className="overflow-hidden h-64 md:h-80 relative">
-          <ImageCarousel images={images} alt={post.title} />
+          <ArticleMedia images={images} title={post.title} />
           <Link to={`/blog/${post.slug}`} className="absolute inset-0 z-0" />
         </div>
         <div className="flex flex-col justify-center p-6 md:p-8 md:pr-12">
@@ -45,18 +55,16 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
           <p className="text-muted-foreground cursor-pointer mb-6 line-clamp-2">
             {post.excerpt}
           </p>
-          <div className="flex cursor-pointer items-center gap-3">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={post.author.avatar} alt={post.author.name} />
-              <AvatarFallback>{post.author.name[0]}</AvatarFallback>
-            </Avatar>
-            <div className="text-sm">
-              <p className="font-medium text-foreground text-primary transition-colors">
-                {post.author.name}
-              </p>
-              <p className="text-muted-foreground">
-                {formatDate(post.publishedAt)}
-              </p>
+          <div className="flex cursor-pointer items-center gap-3 text-sm">
+            {post.author && (
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={post.author.avatar} alt={post.author.name} />
+                <AvatarFallback>{post.author.name[0]}</AvatarFallback>
+              </Avatar>
+            )}
+            <div>
+              {post.author && <p className="font-medium text-primary">{post.author.name}</p>}
+              <p className="text-muted-foreground">{formatDate(post.publishedAt)}</p>
             </div>
           </div>
         </div>
@@ -66,9 +74,9 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
 
   if (variant === "horizontal") {
     return (
-      <article className="group flex gap-4 bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
+      <article ref={ref} className="group flex gap-4 bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
         <div className="w-1/3 min-w-[120px] overflow-hidden relative">
-          <ImageCarousel images={images} alt={post.title} />
+          <ArticleMedia images={images} title={post.title} />
           <Link to={`/blog/${post.slug}`} className="absolute inset-0 z-0" />
         </div>
         <div className="flex-1 py-4 pr-4">
@@ -83,7 +91,7 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
             </h3>
           </Link>
           <p className="text-sm text-muted-foreground">
-            {post.author.name} • {formatDate(post.publishedAt)}
+            {post.author ? `${post.author.name} • ` : ""}{formatDate(post.publishedAt)}
           </p>
         </div>
       </article>
@@ -91,9 +99,9 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
   }
 
   return (
-    <article className="group bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
+    <article ref={ref} className="group bg-card rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
       <div className="block overflow-hidden h-48 relative">
-        <ImageCarousel images={images} alt={post.title} />
+        <ArticleMedia images={images} title={post.title} />
         <Link to={`/blog/${post.slug}`} className="absolute inset-0 z-0" />
       </div>
       <div className="p-5">
@@ -114,11 +122,7 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
           {post.excerpt}
         </p>
         <div className="flex cursor-pointer items-center gap-2 text-sm">
-          <span className="text-muted-foreground">By</span>
-          <p className="font-medium text-foreground text-primary transition-colors">
-            {post.author.name}
-          </p>
-          <span className="text-muted-foreground">•</span>
+          {post.author && <><span className="text-muted-foreground">By</span><p className="font-medium text-primary">{post.author.name}</p><span className="text-muted-foreground">•</span></>}
           <span className="text-muted-foreground">
             {formatDate(post.publishedAt)}
           </span>
@@ -126,6 +130,8 @@ const BlogCard = ({ post, variant = "default" }: BlogCardProps) => {
       </div>
     </article>
   );
-};
+});
+
+BlogCard.displayName = "BlogCard";
 
 export default BlogCard;

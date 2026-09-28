@@ -1,6 +1,4 @@
 import Layout from "@/components/layout/Layout";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { authors } from "@/data/blogData";
 import { useEffect } from "react";
 import gsap from "gsap";
 import { Users, BookOpen, Globe, Award } from "lucide-react";
@@ -115,34 +113,6 @@ const About = () => {
                 </li>
               </ul>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Team */}
-      <section className="py-16 about-section hidden">
-        <div className="container">
-          <h2 className="font-heading text-3xl font-bold text-center mb-12">
-            Meet Our Team
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {authors.map((author) => (
-              <div
-                key={author.id}
-                className="bg-card rounded-xl p-6 text-center shadow-card"
-              >
-                <Avatar className="h-24 w-24 mx-auto mb-4">
-                  <AvatarImage src={author.avatar} alt={author.name} />
-                  <AvatarFallback>{author.name[0]}</AvatarFallback>
-                </Avatar>
-                <h3 className="font-heading font-bold text-lg">
-                  {author.name}
-                </h3>
-                <p className="text-sm text-muted-foreground mt-2">
-                  {author.bio}
-                </p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
